@@ -1,5 +1,5 @@
 use std::error::Error;
-use axum::routing::{get, post, put, Router};
+use axum::routing::{get, post, put, delete, Router};
 
 mod handlers;
 
@@ -28,9 +28,10 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
     println!("server running at: {}", addr);
 
     let app = Router::new()
-        .route("/students", get(handlers::read_students))
         .route("/students", post(handlers::create_student))
+        .route("/students", get(handlers::read_students))
         .route("/students/:id", put(handlers::update_student))
+        .route("/students/:id", delete(handlers::delete_student))
         .with_state(pool);
 
     axum::Server::bind(&addr.parse().unwrap())
