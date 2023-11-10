@@ -11,8 +11,8 @@ async fn main() -> Result<(), Box<dyn Error>> {
 }
 
 async fn start_db_connection() -> Result<(), Box<dyn Error>> {
-    let url = "postgres://dbuser:pass123@localhost:5432/tassls"; // hardcoded for now
-    let pool = sqlx::postgres::PgPool::connect(url).await?;
+    let url = std::env::var("DATABASE").expect("need a database to connect to");
+    let pool = sqlx::postgres::PgPool::connect(&url).await?;
 
     sqlx::migrate!("./migrations").run(&pool).await?;
 
