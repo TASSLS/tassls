@@ -1,5 +1,5 @@
 use std::error::Error;
-use axum::routing::{get, post, Router};
+use axum::routing::{get, post, put, Router};
 
 mod handlers;
 
@@ -16,18 +16,6 @@ async fn start_db_connection() -> Result<(), Box<dyn Error>> {
 
     sqlx::migrate!("./migrations").run(&pool).await?;
 
-    // let test_timetable = Timetable {
-        // student_number: match read_timetables(&pool).await?.last() {
-            // Some(x) => x.student_number + 1,
-            // None => 1
-        // }
-    // };
-    // test_timetable.create(&pool).await?;
-
-    // let test = read_timetables(&pool).await?;
-
-    // println!("StuNumb: {:?}", test);
-
     start_server(pool).await?;
 
     Ok(())
@@ -42,6 +30,7 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
     let app = Router::new()
         .route("/students", get(handlers::read_students))
         .route("/students", post(handlers::create_student))
+        .route("/students/:id", put(handlers::update_student))
         .with_state(pool);
 
     axum::Server::bind(&addr.parse().unwrap())

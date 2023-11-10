@@ -70,3 +70,32 @@ pub async fn read_students(
         Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
     }
 }
+
+pub async fn update_student(
+    extract::State(pool): extract::State<PgPool>,
+    extract::Path(id): extract::Path<uuid::Uuid>,
+    axum::Json(payload): axum::Json<CreateStudent>
+) -> http::StatusCode {
+    let res = sqlx::query(
+        r#"
+        UPDATE students
+        SET name = $1, photo = $2, dob = $3
+        WHERE id = $4
+        "#
+    )
+    .bind(&payload.name)
+    .bind(&payload.photo)
+    .bind(&payload.dob)
+    .bind(id)
+    .execute(&pool)
+    .await
+    .map(|res| match res.rows_affected() {
+        0 => http::StatusCode::NOT_FOUND,
+        _ => http::StatusCode::OK
+    });
+
+    match res {
+        Ok(status) => status,
+        Err(_) => http::StatusCode::INTERNAL_SERVER_ERROR
+    }
+}
