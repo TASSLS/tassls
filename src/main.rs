@@ -5,8 +5,7 @@ mod handlers;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
-    start_db_connection().await?;
-
+    // start_db_connection().await?;
     Ok(())
 }
 
