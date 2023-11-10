@@ -40,7 +40,7 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
     println!("server running at: {}", addr);
 
     let app = Router::new()
-        .route("/", get(handlers::health))
+        .route("/students", get(handlers::read_students))
         .route("/students", post(handlers::create_student))
         .with_state(pool);
 

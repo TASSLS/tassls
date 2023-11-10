@@ -1,8 +1,8 @@
 use axum::{extract, http};
-use serde::Deserialize;
-use sqlx::PgPool;
+use serde::{Serialize, Deserialize};
+use sqlx::{FromRow, PgPool};
 
-#[derive(Debug, Deserialize)]
+#[derive(FromRow, Serialize)]
 pub struct Student {
     id: uuid::Uuid,
     name: String,
@@ -26,14 +26,17 @@ impl Student {
     }
 }
 
-pub async fn health() -> http::StatusCode {
-    http::StatusCode::OK
+#[derive(Debug, Deserialize)]
+pub struct CreateStudent {
+    name: String,
+    photo: String,
+    dob: String
 }
 
 pub async fn create_student(
     extract::State(pool): extract::State<PgPool>,
-    axum::Json(payload): axum::Json<Student>
-) -> Result<http::StatusCode, http::StatusCode> {
+    axum::Json(payload): axum::Json<CreateStudent>
+) -> Result<(http::StatusCode, axum::Json<Student>), http::StatusCode> {
     let student = Student::new(payload.name, payload.photo, payload.dob);
 
     let res = sqlx::query(
@@ -50,7 +53,20 @@ pub async fn create_student(
     .await;
 
     match res {
-        Ok(_) => Ok(http::StatusCode::CREATED),
+        Ok(_) => Ok((http::StatusCode::CREATED, axum::Json(student))),
+        Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+    }
+}
+
+pub async fn read_students(
+    extract::State(pool): extract::State<PgPool>
+) -> Result<axum::Json<Vec<Student>>, http::StatusCode> {
+    let res = sqlx::query_as::<_, Student>("SELECT * FROM students")
+        .fetch_all(&pool)
+        .await;
+
+    match res {
+        Ok(students) => Ok(axum::Json(students)),
         Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
     }
 }
