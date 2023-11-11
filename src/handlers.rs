@@ -5,50 +5,56 @@ use sqlx::{FromRow, PgPool};
 #[derive(FromRow, Serialize)]
 pub struct Student {
     id: uuid::Uuid,
+    password: String,
     name: String,
     photo: String,
-    dob: String
-}
-
-impl Student {
-    fn new(
-        name: String,
-        photo: String,
-        dob: String
-    ) -> Self {
-        let id = uuid::Uuid::new_v4();
-        Self {
-            id,
-            name,
-            photo,
-            dob
-        }
-    }
+    dob: chrono::DateTime<chrono::Utc>,
+    created: chrono::DateTime<chrono::Utc>,
+    updated: chrono::DateTime<chrono::Utc>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct CreateStudent {
+    password: String,
     name: String,
     photo: String,
-    dob: String
+}
+
+impl Student {
+    fn new(student: CreateStudent) -> Self {
+        let id = uuid::Uuid::new_v4();
+        let now = chrono::Utc::now();
+        Self {
+            id,
+            password: student.password,
+            name: student.name,
+            photo: student.photo,
+            dob: now,
+            created: now,
+            updated: now
+        }
+    }
 }
 
 pub async fn create_student(
     extract::State(pool): extract::State<PgPool>,
     axum::Json(payload): axum::Json<CreateStudent>
 ) -> Result<(http::StatusCode, axum::Json<Student>), http::StatusCode> {
-    let student = Student::new(payload.name, payload.photo, payload.dob);
+    let student = Student::new(CreateStudent{ password: payload.password, name: payload.name, photo: payload.photo});
 
     let res = sqlx::query(
         r#"
-        INSERT INTO students (id, name, photo, dob)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO students (id, password, name, photo, dob, created, updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         "#
-        )
+    )
     .bind(&student.id)
+    .bind(&student.password)
     .bind(&student.name)
     .bind(&student.photo)
     .bind(&student.dob)
+    .bind(&student.created)
+    .bind(&student.updated)
     .execute(&pool)
     .await;
 
@@ -79,13 +85,14 @@ pub async fn update_student(
     let res = sqlx::query(
         r#"
         UPDATE students
-        SET name = $1, photo = $2, dob = $3
-        WHERE id = $4
+        SET password = $1, name = $2, photo = $3, dob = $4, updated = $5
+        WHERE id = $6
         "#
     )
+    .bind(&payload.password)
     .bind(&payload.name)
     .bind(&payload.photo)
-    .bind(&payload.dob)
+    .bind(chrono::Utc::now())
     .bind(id)
     .execute(&pool)
     .await

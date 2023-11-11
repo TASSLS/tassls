@@ -1,0 +1,121 @@
+body {
+    background-color: #f2efef;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    position: relative;
+    background-color: #fffdee;
+    padding: 10px;
+    text-align: left;
+    overflow: hidden;
+}
+
+.shape {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: #333;
+}
+
+.shape-square {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+}
+
+.shape-triangle {
+    clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+}
+
+.shape-circle {
+    clip-path: circle(40%);
+}
+
+#logo {
+    width: 200px;
+}
+
+nav {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: left;
+}
+
+nav a {
+    text-decoration: none;
+    color: white;
+    margin: 0 10px;
+    align: left;
+}
+
+nav a:hover {
+    color: #5782bb;
+    transition: .3s ease;
+}
+
+section {
+    padding: 20px;
+    text-align: center;
+}
+
+.login-signup-box {
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.login-signup-box h2 {
+    color: #333;
+    text-align: center;
+}
+
+.login-signup-box form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-signup-box label {
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.login-signup-box input {
+    padding: 8px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.login-signup-box button {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.login-signup-box button:hover {
+    background-color: #555;
+}
+
+.login-signup-box p {
+    text-align: center;
+    margin-top: 16px;
+    color: #333;
+}
+
+.login-signup-box a {
+    color: #555;
+}
+
+hint {
+    color: #757070;
+}
