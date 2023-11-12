@@ -47,12 +47,15 @@ nav a {
     text-decoration: none;
     color: white;
     margin: 0 10px;
-    align: left;
 }
 
-nav a:hover {
+nav a:hover, nav a#nav-selected:hover {
     color: #5782bb;
     transition: .3s ease;
+}
+
+nav a#nav-selected {
+    color: #fffdee;
 }
 
 section {
@@ -60,62 +63,6 @@ section {
     text-align: center;
 }
 
-.login-signup-box {
-    background-color: #ffffff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.login-signup-box h2 {
-    color: #333;
-    text-align: center;
-}
-
-.login-signup-box form {
-    display: flex;
-    flex-direction: column;
-}
-
-.login-signup-box label {
-    margin-bottom: 8px;
-    color: #333;
-}
-
-.login-signup-box input {
-    padding: 8px;
-    margin-bottom: 16px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.login-signup-box button {
-    background-color: #333;
-    color: white;
-    padding: 10px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.login-signup-box button:hover {
-    background-color: #555;
-}
-
-.login-signup-box p {
-    text-align: center;
-    margin-top: 16px;
-    color: #333;
-}
-
-.login-signup-box a {
-    color: #555;
-}
-
 hint {
-    color: #757070;
+    color: #888;
 }

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS students (
     id UUID PRIMARY KEY,
+    username varchar NOT NULL,
     password varchar NOT NULL,
     name varchar NOT NULL,
     photo varchar NOT NULL,

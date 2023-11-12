@@ -102,6 +102,25 @@ pub async fn read_students_name(
     }
 }
 
+pub async fn read_students_id(
+    extract::State(pool): extract::State<PgPool>,
+    extract::Path(id): extract::Path<uuid::Uuid>
+) -> Result<axum::Json<Vec<Student>>, http::StatusCode> {
+    let res = sqlx::query_as::<_, Student>(
+        r#"SELECT * FROM students
+        WHERE id = $1
+        "#
+    )
+    .bind(id)
+    .fetch_all(&pool)
+    .await;
+
+    match res {
+        Ok(students) => Ok(axum::Json(students)),
+        Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+    }
+}
+
 pub async fn update_student(
     extract::State(pool): extract::State<PgPool>,
     extract::Path(id): extract::Path<uuid::Uuid>,

@@ -30,6 +30,7 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
         .route("/students", post(handlers::create_student))
         .route("/students", get(handlers::read_students))
         .route("/students/part/:username", get(handlers::read_students_name))
+        .route("/students/dao/:id", get(handlers::read_students_id))
         .route("/students/:id", put(handlers::update_student))
         .route("/students/:id", delete(handlers::delete_student))
         .with_state(pool);
