@@ -5,6 +5,7 @@ use sqlx::{FromRow, PgPool};
 #[derive(FromRow, Serialize)]
 pub struct Student {
     id: uuid::Uuid,
+    username: String,
     password: String,
     name: String,
     photo: String,
@@ -15,6 +16,7 @@ pub struct Student {
 
 #[derive(Debug, Deserialize)]
 pub struct CreateStudent {
+    username: String,
     password: String,
     name: String,
     photo: String,
@@ -26,6 +28,7 @@ impl Student {
         let now = chrono::Utc::now();
         Self {
             id,
+            username: student.username,
             password: student.password,
             name: student.name,
             photo: student.photo,
@@ -40,15 +43,21 @@ pub async fn create_student(
     extract::State(pool): extract::State<PgPool>,
     axum::Json(payload): axum::Json<CreateStudent>
 ) -> Result<(http::StatusCode, axum::Json<Student>), http::StatusCode> {
-    let student = Student::new(CreateStudent{ password: payload.password, name: payload.name, photo: payload.photo});
+    let student = Student::new(CreateStudent {
+        username: payload.username,
+        password: payload.password,
+        name: payload.name,
+        photo: payload.photo
+    });
 
     let res = sqlx::query(
         r#"
-        INSERT INTO students (id, password, name, photo, dob, created, updated)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO students (id, username, password, name, photo, dob, created, updated)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         "#
     )
     .bind(&student.id)
+    .bind(&student.username)
     .bind(&student.password)
     .bind(&student.name)
     .bind(&student.photo)
@@ -77,6 +86,22 @@ pub async fn read_students(
     }
 }
 
+pub async fn read_students_name(
+    extract::State(pool): extract::State<PgPool>,
+    extract::Path(username): extract::Path<String>
+) -> Result<axum::Json<Vec<Student>>, http::StatusCode> {
+    let res = sqlx::query_as::<_, Student>(r#"SELECT * FROM students
+                                           WHERE username = $1"#)
+        .bind(&username)
+        .fetch_all(&pool)
+        .await;
+
+    match res {
+        Ok(students) => Ok(axum::Json(students)),
+        Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+    }
+}
+
 pub async fn update_student(
     extract::State(pool): extract::State<PgPool>,
     extract::Path(id): extract::Path<uuid::Uuid>,
@@ -85,10 +110,11 @@ pub async fn update_student(
     let res = sqlx::query(
         r#"
         UPDATE students
-        SET password = $1, name = $2, photo = $3, dob = $4, updated = $5
-        WHERE id = $6
+        SET username = $1, password = $2, name = $3, photo = $4, dob = $5, updated = $6
+        WHERE id = $7
         "#
     )
+    .bind(&payload.username)
     .bind(&payload.password)
     .bind(&payload.name)
     .bind(&payload.photo)
