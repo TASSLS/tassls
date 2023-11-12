@@ -1,6 +1,4 @@
 // -- Manage user account login --
-
-
 const URL = "http://127.0.0.1:3000";
 const STUDENT_ENDPOINT = "/students";
 async function sendGet(url) {
@@ -22,7 +20,7 @@ async function verify() {
         return;
     }
     let students = await sendGet(URL+STUDENT_ENDPOINT + "/part/" + username);
-    if(students[0] == undefined) {
+    if(typeof students == undefined || students == "") {
         invalid();
         return;
     }
@@ -36,9 +34,10 @@ async function verify() {
 
 async function login() {
     const id = getCookie("account_id");
-    const account = (await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + id))[0]
-    if(account.name == undefined) {
-        document.cookie = ""
+    const account = (await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + id))[0];
+    if(typeof account == "undefined") {
+        document.cookie = "account_id=";;
+        document.getElementById("nav-account").click();
         return;
     }
     document.getElementById("nav-account").innerText = account.name;
@@ -68,7 +67,7 @@ function success(id) {
 }
 
 function getCookie(name) {
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) return parts.pop().split(';').shift();
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
 }

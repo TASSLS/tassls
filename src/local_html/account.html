@@ -22,7 +22,7 @@
             <a href="./timetable.html">TIMETABLE</a>
         </nav>
 
-
+        <div id="userInfoContainer"></div>
         <section id="loginSignupSection">
             <div class="login-signup-box" id="loginSignupBox">
                 <h2>Login or Sign Up</h2>
@@ -35,33 +35,27 @@
 
                     <button type="button" onclick="verify()">Login</button>
                 </form>
+                <br>
                 <div class="error-popup" id="errorPopup">
                     <span class="exclamation">!</span>
                     <p>Incorrect username or password<p>
                 </div>
+
                 <p>Don't have an account?</p>
                 <p>Contact your school IT and <a href="#" id="signupLink">Sign up here</a>.</p>
             </div>
-
         </section>
-
-        <section class="user-info-box">
-            <h2>User Information</h2>
-            <form id="userInfoForm">
-                <label for="userName">User Name:</label>
-                <input type="text" id="userName" name="userName" value="JohnDoe" readonly>
-
-                <label for="userPassword">User Password:</label>
-                <input type="password" id="userPassword" name="userPassword" value="********" readonly>
-
-                <button type="button" onclick="changePassword()">Change Password</button>
-            </form>
+        <div class="admin-control-center">
+            <h2>Admin Controls: </h2>
+            <button>Login As Admin</button>
+            <button>Edit Account</button>
+            <button>Remove Account</button>
+        </div>
         </section>
-
         <section>
             <p>TASSLS</p>
             <p>The Alpha School System Like System</p>
         </section>
-
+        <div id="adminControlContainer"></div>
     </body>
 </html>
