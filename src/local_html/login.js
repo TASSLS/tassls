@@ -8,13 +8,30 @@ function hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
 }
 
+function showError(message) {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+}
+
+function hideError() {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.style.display = 'none';
+}
+
 const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
 const STUDENT_ENDPOINT = "/students";
 async function sendGet(url) {
     console.log("GETting " + url)
-    return fetch(url)
-        .then((response) => response.json())
-        .then((json) => json);
+    try {
+        let res = await fetch(url)
+        if(!res.ok)
+            throw new Error(`fetching error: ${res.status}`)
+        return res.json();
+    } catch(error) {
+        showError(error)
+        hideLoading()
+    }
 }
 
 async function verify() {
@@ -31,6 +48,7 @@ async function verify() {
     showLoading(URL+STUDENT_ENDPOINT + "/part/" + username)
     let students = await sendGet(URL+STUDENT_ENDPOINT + "/part/" + username);
     hideLoading()
+    console.log(students)
     if(typeof students == "undefined" || students == "") {
         invalid();
         return;

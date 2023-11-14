@@ -1,5 +1,4 @@
 // -- multiple uses for login section --
-
 function showLoading(URL) {
     document.getElementById('loadingOverlay').style.display = 'flex';
     document.getElementById('loading-text').innerText = "fetching:\n" + URL;
@@ -7,6 +6,17 @@ function showLoading(URL) {
 
 function hideLoading() {
     document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+function showError(message) {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.textContent = message;
+    errorBox.style.display = 'block';
+}
+
+function hideError() {
+    const errorBox = document.getElementById('errorBox');
+    errorBox.style.display = 'none';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -89,9 +99,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     const STUDENT_ENDPOINT = "/students";
     async function sendGet(url) {
         console.log("GETting " + url)
-        return fetch(url)
-            .then((response) => response.json())
-            .then((json) => json);
+        try {
+            let res = await fetch(url)
+            if(!res.ok)
+                throw new Error(`fetching error: ${res.status}`)
+            return res.json();
+        } catch(error) {
+            showError(error)
+            hideLoading()
+        }
     }
     showLoading(URL+STUDENT_ENDPOINT + "/dao/" + accountId)
     const account = (await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + accountId))[0];
@@ -223,7 +239,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         box.appendChild(leftHalf);
         box.appendChild(rightHalf);
 
-        // box.appendChild("test");
         return box;
     }
 })
@@ -232,7 +247,7 @@ function changePassword(info) {
     const passwordInput = document.getElementById("passwordButton");
     passwordInput.readOnly = false;
     passwordInput.style.backgroundColor = "white";
-    passwordInput.type = "";
+    passwordInput.type = "text";
     const passwordButton = document.getElementById("changePasswordButton");
     passwordButton.removeEventListener('click', changePassword);
     passwordButton.innerText = "Submit New Password";
@@ -246,19 +261,25 @@ function changePassword(info) {
             createAccount.password = account.password;
             createAccount.name = account.name;
             createAccount.photo = account.photo;
-            return fetch(PATH, {
-                method: 'PUT',
-                credentials: "same-origin",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(createAccount)
-            })
-                .then(response => response.json())
-                .then((json) => json);
+            try {
+                let res = await fetch(PATH, {
+                    method: 'PUT',
+                    credentials: "same-origin",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(createAccount)
+                })
+                if(!res.ok)
+                    throw new Error(`fetching error: ${res.status}`)
+                return res.json();
+            } catch(error) {
+                showError(error)
+                hideLoading()
+            }
         }
         showLoading(URL+STUDENT_ENDPOINT+"/"+info.id, info)
-        await sendPut(info);
+        await sendPut(URL+STUDENT_ENDPOINT+"/"+info.id, info, info);
         hideLoading()
         location.reload();
     });
