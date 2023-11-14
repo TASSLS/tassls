@@ -20,7 +20,7 @@ async function verify() {
         return;
     }
     let students = await sendGet(URL+STUDENT_ENDPOINT + "/part/" + username);
-    if(typeof students == undefined || students == "") {
+    if(typeof students == "undefined" || students == "") {
         invalid();
         return;
     }

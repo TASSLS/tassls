@@ -70,9 +70,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.addEventListener('DOMContentLoaded', async function() {
     const accountId = getCookie("account_id");
-    if(accountId == "")
+    if(typeof accountId == "undefined" || accountId == "")
         return;
-    document.getElementById("loginSignupBox").remove()
+    document.getElementById("loginSignupBox").remove();
+    document.getElementById("admin-control-center").style.display = "flex";
 
     const URL = "http://127.0.0.1:3000";
     const STUDENT_ENDPOINT = "/students";
@@ -157,13 +158,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         userNameLabel.textContent = 'Username:';
         const userNameInput = document.createElement('input');
         userNameInput.type = 'text';
-        userNameInput.name = 'username';
+        userNameInput.id = 'username';
         userNameInput.value = account.name;
         userNameInput.readOnly = true;
 
         const userPasswordLabel = document.createElement('label');
         userPasswordLabel.textContent = 'Password:';
         const userPasswordInput = document.createElement('input');
+        userPasswordInput.id = 'passwordButton';
         userPasswordInput.type = 'password';
         userPasswordInput.name = 'password';
         userPasswordInput.value = account.password;
@@ -185,6 +187,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         userUpdatedInput.value = account.updated;
         userUpdatedInput.readOnly = true;
 
+        const changePasswordButton = document.createElement('button');
+        changePasswordButton.type = 'button';
+        changePasswordButton.textContent = 'Change Password';
+        changePasswordButton.id = 'changePasswordButton';
+        changePasswordButton.addEventListener('click', () => changePassword(account));
+
         formRight.appendChild(userIdLabel);
         formRight.appendChild(userIdInput);
         formRight.appendChild(userNameLabel);
@@ -195,15 +203,52 @@ document.addEventListener('DOMContentLoaded', async function() {
         formRight.appendChild(userCreatedInput);
         formRight.appendChild(userUpdatedLabel);
         formRight.appendChild(userUpdatedInput);
+        formRight.appendChild(changePasswordButton);
 
         rightHalf.appendChild(formRight);
 
         box.appendChild(leftHalf);
         box.appendChild(rightHalf);
 
+        // box.appendChild("test");
         return box;
     }
 })
+
+function changePassword(info) {
+    const passwordInput = document.getElementById("passwordButton");
+    passwordInput.readOnly = false;
+    passwordInput.style.backgroundColor = "white";
+    passwordInput.type = "";
+    const passwordButton = document.getElementById("changePasswordButton");
+    passwordButton.removeEventListener('click', changePassword);
+    passwordButton.innerText = "Submit New Password";
+    passwordButton.addEventListener('click', async function submit() {
+        passwordButton.removeEventListener('click', submit);
+
+        async function sendPut(account) {
+            const PATH = URL+STUDENT_ENDPOINT+"/"+info.id;
+            console.log("PUTting " + PATH)
+            let createAccount = {};
+            createAccount.username = account.username;
+            createAccount.password = account.password;
+            createAccount.name = account.name;
+            createAccount.photo = account.photo;
+            return fetch(PATH, {
+                method: 'PUT',
+                credentials: "same-origin",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(createAccount)
+            })
+                .then(response => response.json())
+                .then((json) => json);
+        }
+        await sendPut(info);
+        location.reload();
+    });
+}
 
 function getCookie(name) {
     const value = `; ${document.cookie}`;
