@@ -1,4 +1,14 @@
 // -- multiple uses for login section --
+
+function showLoading(URL) {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    document.getElementById('loading-text').innerText = "fetching:\n" + URL;
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const loginSignupSection = document.getElementById('loginSignupSection');
     const loginSignupBox = document.getElementById('loginSignupBox');
@@ -75,7 +85,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById("loginSignupBox").remove();
     document.getElementById("admin-control-center").style.display = "flex";
 
-    const URL = "http://127.0.0.1:3000";
+    const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
     const STUDENT_ENDPOINT = "/students";
     async function sendGet(url) {
         console.log("GETting " + url)
@@ -83,8 +93,11 @@ document.addEventListener('DOMContentLoaded', async function() {
             .then((response) => response.json())
             .then((json) => json);
     }
-
+    showLoading(URL+STUDENT_ENDPOINT + "/dao/" + accountId)
     const account = (await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + accountId))[0];
+    hideLoading()
+    if(typeof account == "undefined" || account == "")
+        return;
 
     const userInfoContainer = document.getElementById('userInfoContainer');
     const newUserInfoBox = createUserInfoBox();
@@ -226,8 +239,7 @@ function changePassword(info) {
     passwordButton.addEventListener('click', async function submit() {
         passwordButton.removeEventListener('click', submit);
 
-        async function sendPut(account) {
-            const PATH = URL+STUDENT_ENDPOINT+"/"+info.id;
+        async function sendPut(PATH, account) {
             console.log("PUTting " + PATH)
             let createAccount = {};
             createAccount.username = account.username;
@@ -245,7 +257,9 @@ function changePassword(info) {
                 .then(response => response.json())
                 .then((json) => json);
         }
+        showLoading(URL+STUDENT_ENDPOINT+"/"+info.id, info)
         await sendPut(info);
+        hideLoading()
         location.reload();
     });
 }

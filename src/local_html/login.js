@@ -1,5 +1,14 @@
 // -- Manage user account login --
-const URL = "http://127.0.0.1:3000";
+function showLoading(URL) {
+    document.getElementById('loadingOverlay').style.display = 'flex';
+    document.getElementById('loading-text').innerText = "fetching:\n" + URL;
+}
+
+function hideLoading() {
+    document.getElementById('loadingOverlay').style.display = 'none';
+}
+
+const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
 const STUDENT_ENDPOINT = "/students";
 async function sendGet(url) {
     console.log("GETting " + url)
@@ -19,7 +28,9 @@ async function verify() {
         invalid()
         return;
     }
+    showLoading(URL+STUDENT_ENDPOINT + "/part/" + username)
     let students = await sendGet(URL+STUDENT_ENDPOINT + "/part/" + username);
+    hideLoading()
     if(typeof students == "undefined" || students == "") {
         invalid();
         return;
@@ -34,7 +45,9 @@ async function verify() {
 
 async function login() {
     const id = getCookie("account_id");
+    showLoading(URL+STUDENT_ENDPOINT + "/dao/" + id)
     const account = (await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + id))[0];
+    hideLoading()
     if(typeof account == "undefined") {
         document.cookie = "account_id=";;
         document.getElementById("nav-account").click();
