@@ -129,8 +129,8 @@ pub async fn update_student(
     let res = sqlx::query(
         r#"
         UPDATE students
-        SET username = $1, password = $2, name = $3, photo = $4, dob = $5, updated = $6
-        WHERE id = $7
+        SET username = $1, password = $2, name = $3, photo = $4, updated = $5
+        WHERE id = $6
         "#
     )
     .bind(&payload.username)

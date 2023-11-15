@@ -1,5 +1,6 @@
 use std::error::Error;
 use axum::routing::{get, post, put, delete, Router};
+use tower_http::cors::CorsLayer;
 
 mod handlers;
 
@@ -33,6 +34,7 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
         .route("/students/dao/:id", get(handlers::read_students_id))
         .route("/students/:id", put(handlers::update_student))
         .route("/students/:id", delete(handlers::delete_student))
+        .layer(CorsLayer::permissive())
         .with_state(pool);
 
     axum::Server::bind(&addr.parse().unwrap())
