@@ -60,6 +60,7 @@ async function verify() {
             return;
         }
     });
+    invalid();
 }
 
 async function login() {
