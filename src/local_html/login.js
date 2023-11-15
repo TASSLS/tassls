@@ -74,7 +74,11 @@ async function login() {
     document.getElementById("nav-account").innerText = account.name;
 }
 
-window.addEventListener('load', verify)
+window.addEventListener('load', () => {
+    if(getCookie("account_id") != "") {
+        login();
+        return;
+    }})
 
 
 function invalid() {

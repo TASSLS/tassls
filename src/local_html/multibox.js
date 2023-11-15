@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
         box.classList.add('login-signup-box');
 
         const h2 = document.createElement('h2');
-        h2.textContent = 'Sign Up (UNFINISHED, GOTTA ADD ALL HTTP BODY)';
+        h2.textContent = 'Sign Up';
         box.appendChild(h2);
 
         const form = document.createElement('form');
@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const usernameLabel = document.createElement('label');
         usernameLabel.textContent = 'Admin Username:';
         const usernameInput = document.createElement('input');
+        usernameInput.id = 'admin-username';
         usernameInput.type = 'text';
         usernameInput.name = 'username';
         form.appendChild(usernameLabel);
@@ -52,17 +53,85 @@ document.addEventListener('DOMContentLoaded', function() {
         const passwordLabel = document.createElement('label');
         passwordLabel.textContent = 'Admin Password:';
         const passwordInput = document.createElement('input');
+        passwordInput.id = 'admin-password';
         passwordInput.type = 'password';
         passwordInput.name = 'password';
         form.appendChild(passwordLabel);
         form.appendChild(passwordInput);
 
+        const studentUserLabel = document.createElement('label');
+        studentUserLabel.textContent = 'Student Username:';
+        const studentUserInput = document.createElement('input');
+        studentUserInput.id = 'student-username';
+        studentUserInput.type = 'text';
+        studentUserInput.name = 'studentUser';
+        form.appendChild(studentUserLabel);
+        form.appendChild(studentUserInput);
+
+        const studentPassLabel = document.createElement('label');
+        studentPassLabel.textContent = 'Student password:';
+        const studentPassInput = document.createElement('input');
+        studentPassInput.id = 'student-password';
+        studentPassInput.type = 'password';
+        studentPassInput.name = 'studentPass';
+        form.appendChild(studentPassLabel);
+        form.appendChild(studentPassInput);
+
+        const studentNameLabel = document.createElement('label');
+        studentNameLabel.textContent = 'Student name:';
+        const studentNameInput = document.createElement('input');
+        studentNameInput.id = 'student-name';
+        studentNameInput.type = 'text';
+        studentNameInput.name = 'studentName';
+        form.appendChild(studentNameLabel);
+        form.appendChild(studentNameInput);
+
+        const studentPhotoLabel = document.createElement('label');
+        studentPhotoLabel.textContent = 'Student Photo (URL):';
+        const studentPhotoInput = document.createElement('input');
+        studentPhotoInput.id = 'student-photo';
+        studentPhotoInput.type = 'text';
+        studentPhotoInput.name = 'studentPhoto';
+        form.appendChild(studentPhotoLabel);
+        form.appendChild(studentPhotoInput);
+
+
         const submitButton = document.createElement('button');
-        submitButton.type = 'submit';
+        submitButton.type = 'button';
         submitButton.textContent = 'Create Student Account';
         form.appendChild(submitButton);
-
+        submitButton.addEventListener('click', createAccount)
         box.appendChild(form);
+        async function createAccount() {
+            let failed = false;
+            async function sendPost(PATH) {
+                console.log("PUTting " + PATH)
+                let createAccount = {};
+                createAccount.username = document.getElementById("student-username").value;
+                createAccount.password = document.getElementById("student-password").value;
+                createAccount.name = document.getElementById("student-name").value;
+                createAccount.photo = document.getElementById("student-photo").value;
+                try {
+                    let res = await fetch(PATH, {
+                        method: 'POST',
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(createAccount)
+                    })
+                    if(!res.ok)
+                        throw new Error(`fetching error: ${res.status}`)
+                    return res;
+                } catch(error) {
+                    failed = true;
+                    showError(error)
+                    hideLoading()
+                }
+            }
+            showLoading(URL+STUDENT_ENDPOINT)
+            await sendPost(URL+STUDENT_ENDPOINT);
+            hideLoading()
+            if(!failed)
+                location.reload();
+        }
 
 
         const br = document.createElement('br');
@@ -70,6 +139,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const hint = document.createElement('hint');
         hint.innerHTML = "Hint: admin username and password is just \"admin\"";
         box.appendChild(hint);
+        const hint1 = document.createElement('hint');
+        hint1.innerHTML = "\nHint: DOB is set to creation time for this example";
+        box.appendChild(hint1);
 
         const paragraph = document.createElement('p');
         paragraph.innerHTML = "Already have an account? ";
