@@ -35,7 +35,7 @@ async function sendGet(url) {
 }
 
 async function verify() {
-    if(getCookie("account_id") != "") {
+    if(typeof getCookie("account_id") == "undefined" || getCookie("account_id") != "") {
         login();
         return;
     }
@@ -74,7 +74,7 @@ async function login() {
 }
 
 window.addEventListener('load', () => {
-    if(getCookie("account_id") != "") {
+    if(typeof getCookie("account_id") == "undefined" || getCookie("account_id") != "") {
         login();
         return;
     }})
