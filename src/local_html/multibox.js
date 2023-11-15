@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById("loginSignupBox").remove();
     document.getElementById("admin-control-center").style.display = "flex";
 
-    const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+    const URL = "http://127.0.0.1:3000";
     const STUDENT_ENDPOINT = "/students";
     async function sendGet(url) {
         console.log("GETting " + url)
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const formleft = document.createElement('form');
 
         const nameLabel = document.createElement('label');
-        nameLabel.textContent = 'name:';
+        nameLabel.textContent = 'Name:';
         const nameInput = document.createElement('input');
         nameInput.type = 'text';
         nameInput.name = 'name';
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         nameInput.readOnly = true;
 
         const photoLabel = document.createElement('label');
-        photoLabel.textContent = 'photo:';
+        photoLabel.textContent = 'Photo:';
         const photoInput = document.createElement('input');
         photoInput.type = 'text';
         photoInput.photo = 'photo';
@@ -150,12 +150,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         photoInput.readOnly = true;
 
         const dobLabel = document.createElement('label');
-        dobLabel.textContent = 'dob:';
+        dobLabel.textContent = 'DOB:';
         const dobInput = document.createElement('input');
         dobInput.type = 'text';
         dobInput.dob = 'dob';
         dobInput.value = account.dob;
         dobInput.readOnly = true;
+
+        const logoutButton = document.createElement('button');
+        logoutButton.type = 'button';
+        logoutButton.textContent = 'Logout';
+        logoutButton.addEventListener('click', () => {
+            document.cookie = "account_id=;"
+            location.reload();
+        });
+
 
         formleft.appendChild(nameLabel);
         formleft.appendChild(nameInput);
@@ -163,6 +172,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         formleft.appendChild(photoInput);
         formleft.appendChild(dobLabel);
         formleft.appendChild(dobInput);
+        formleft.appendChild(logoutButton);
 
         leftHalf.appendChild(formleft);
 
@@ -253,35 +263,34 @@ function changePassword(info) {
     passwordButton.innerText = "Submit New Password";
     passwordButton.addEventListener('click', async function submit() {
         passwordButton.removeEventListener('click', submit);
-
+        let failed = false;
         async function sendPut(PATH, account) {
             console.log("PUTting " + PATH)
             let createAccount = {};
             createAccount.username = account.username;
-            createAccount.password = account.password;
+            createAccount.password = document.getElementById("passwordButton").value;
             createAccount.name = account.name;
             createAccount.photo = account.photo;
             try {
                 let res = await fetch(PATH, {
                     method: 'PUT',
-                    credentials: "same-origin",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: {"Content-Type": "application/json"},
                     body: JSON.stringify(createAccount)
                 })
                 if(!res.ok)
                     throw new Error(`fetching error: ${res.status}`)
-                return res.json();
+                return res;
             } catch(error) {
+                failed = true;
                 showError(error)
                 hideLoading()
             }
         }
-        showLoading(URL+STUDENT_ENDPOINT+"/"+info.id, info)
-        await sendPut(URL+STUDENT_ENDPOINT+"/"+info.id, info, info);
+        showLoading(URL+STUDENT_ENDPOINT+"/"+info.id)
+        await sendPut(URL+STUDENT_ENDPOINT+"/"+info.id, info);
         hideLoading()
-        location.reload();
+        if(!failed)
+            location.reload();
     });
 }
 

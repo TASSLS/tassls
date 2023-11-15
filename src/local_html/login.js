@@ -19,7 +19,8 @@ function hideError() {
     errorBox.style.display = 'none';
 }
 
-const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+// const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+const URL = "http://127.0.0.1:3000";
 const STUDENT_ENDPOINT = "/students";
 async function sendGet(url) {
     console.log("GETting " + url)
@@ -35,7 +36,7 @@ async function sendGet(url) {
 }
 
 async function verify() {
-    if(getCookie("account_id" != "")) {
+    if(getCookie("account_id") != "") {
         login();
         return;
     }
@@ -48,7 +49,6 @@ async function verify() {
     showLoading(URL+STUDENT_ENDPOINT + "/part/" + username)
     let students = await sendGet(URL+STUDENT_ENDPOINT + "/part/" + username);
     hideLoading()
-    console.log(students)
     if(typeof students == "undefined" || students == "") {
         invalid();
         return;
@@ -67,14 +67,14 @@ async function login() {
     const account = (await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + id))[0];
     hideLoading()
     if(typeof account == "undefined") {
-        document.cookie = "account_id=";;
+        document.cookie = "account_id=;";
         document.getElementById("nav-account").click();
         return;
     }
     document.getElementById("nav-account").innerText = account.name;
 }
 
-window.addEventListener('load', login)
+window.addEventListener('load', verify)
 
 
 function invalid() {
