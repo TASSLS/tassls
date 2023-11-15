@@ -1,4 +1,6 @@
 // -- Manage user account login --
+if(document.cookie == "")
+    document.cookie = "account_id=;";
 function showLoading(URL) {
     document.getElementById('loadingOverlay').style.display = 'flex';
     document.getElementById('loading-text').innerText = "fetching:\n" + URL;
