@@ -43,20 +43,17 @@
                 <br>
                 <div class="error-popup" id="errorPopup">
                     <span class="exclamation">!</span>
-                    <p>Incorrect username or password<p>
+                    <p>Incorrect username or password</p>
                 </div>
-
                 <p>Don't have an account?</p>
                 <p>Contact your school IT and <a href="#" id="signupLink">Sign up here</a>.</p>
             </div>
         </section>
         <div id="admin-control-center" class="admin-control-center" style="display: none">
             <h2>Admin Controls: </h2>
-            <button>Login As Admin</button>
-            <button>Edit Account</button>
-            <button>Remove Account</button>
+            <button type="button" id="editButton" onclick="editAsAdmin()">Edit Account</button>
+            <button type="button" onclick="removeAsAdmin()">Remove Account</button>
         </div>
-        </section>
         <section>
             <p>TASSLS</p>
             <p>The Alpha School System Like System</p>

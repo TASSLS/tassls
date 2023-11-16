@@ -18,8 +18,8 @@ function hideError() {
     const errorBox = document.getElementById('errorBox');
     errorBox.style.display = 'none';
 }
-
 document.addEventListener('DOMContentLoaded', function() {
+    const errorPopup = document.getElementById('errorPopup');
     const loginSignupSection = document.getElementById('loginSignupSection');
     const loginSignupBox = document.getElementById('loginSignupBox');
     const signupLink = document.getElementById('signupLink');
@@ -95,14 +95,29 @@ document.addEventListener('DOMContentLoaded', function() {
         form.appendChild(studentPhotoLabel);
         form.appendChild(studentPhotoInput);
 
-
         const submitButton = document.createElement('button');
         submitButton.type = 'button';
         submitButton.textContent = 'Create Student Account';
         form.appendChild(submitButton);
         submitButton.addEventListener('click', createAccount)
         box.appendChild(form);
+        const br = document.createElement('br');
+        box.appendChild(br);
+
+        const errorPopupCreate = errorPopup.cloneNode(true);
+        box.appendChild(errorPopupCreate);
+
         async function createAccount() {
+            const adminDetails = "admin";
+            if(document.getElementById("admin-username").value != adminDetails || document.getElementById("admin-password").value != adminDetails) {
+                const error = document.getElementById("errorPopup");
+                error.style.display = 'block';
+
+                void errorPopup.offsetWidth;
+
+                setTimeout(() => { error.style.display = 'none'; }, 2000);
+                return;
+            }
             let failed = false;
             async function sendPost(PATH) {
                 console.log("PUTting " + PATH)
@@ -133,9 +148,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 location.reload();
         }
 
-
-        const br = document.createElement('br');
-        box.appendChild(br);
+        const br1 = document.createElement('br');
+        box.appendChild(br1);
         const hint = document.createElement('hint');
         hint.innerHTML = "Hint: admin username and password is just \"admin\"";
         box.appendChild(hint);
@@ -208,6 +222,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const nameLabel = document.createElement('label');
         nameLabel.textContent = 'Name:';
         const nameInput = document.createElement('input');
+        nameInput.id = 'student-name';
         nameInput.type = 'text';
         nameInput.name = 'name';
         nameInput.value = account.name;
@@ -216,6 +231,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const photoLabel = document.createElement('label');
         photoLabel.textContent = 'Photo:';
         const photoInput = document.createElement('input');
+        photoInput.id = 'student-photo';
         photoInput.type = 'text';
         photoInput.photo = 'photo';
         photoInput.value = account.photo;
@@ -260,6 +276,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const userIdLabel = document.createElement('label');
         userIdLabel.textContent = 'UUID:';
         const userIdInput = document.createElement('input');
+        userIdInput.id = 'student-id';
         userIdInput.type = 'text';
         userIdInput.name = 'id';
         userIdInput.value = account.id;
@@ -268,9 +285,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         const userNameLabel = document.createElement('label');
         userNameLabel.textContent = 'Username:';
         const userNameInput = document.createElement('input');
+        userNameInput.id = 'student-username';
         userNameInput.type = 'text';
         userNameInput.id = 'username';
-        userNameInput.value = account.name;
+        userNameInput.value = account.username;
         userNameInput.readOnly = true;
 
         const userPasswordLabel = document.createElement('label');
@@ -360,6 +378,82 @@ function changePassword(info) {
         }
         showLoading(URL+STUDENT_ENDPOINT+"/"+info.id)
         await sendPut(URL+STUDENT_ENDPOINT+"/"+info.id, info);
+        hideLoading()
+        if(!failed)
+            location.reload();
+    });
+}
+
+async function removeAsAdmin() {
+    let failed = false;
+    async function sendDelete(url) {
+        console.log("GETting " + url)
+        try {
+            let res = await fetch(url, {
+                method: 'DELETE'
+            })
+            if(!res.ok)
+                throw new Error(`fetching error: ${res.status}`)
+            return res;
+        } catch(error) {
+            failed = true;
+            showError(error)
+            hideLoading()
+        }
+    }
+
+    const id = document.getElementById("student-id").value;
+    showLoading(URL+STUDENT_ENDPOINT+"/"+id)
+    await sendDelete(URL+STUDENT_ENDPOINT+"/"+id);
+    hideLoading()
+    if(!failed)
+        location.reload();
+}
+
+async function editAsAdmin() {
+    const editButton = document.getElementById("editButton");
+    editButton.innerText = "Submit Changes";
+
+    function editInput(input) {
+        const inputElem = document.getElementById(input);
+        inputElem.readOnly = false;
+        inputElem.style.backgroundColor = "white";
+    }
+
+    editInput("username")
+    editInput("passwordButton");
+    editInput("student-name");
+    editInput("student-photo");
+
+    editButton.addEventListener('click', async function submit() {
+        editButton.removeEventListener('click', editAsAdmin);
+        let failed = false;
+        async function sendPut(PATH) {
+            console.log("PUTting " + PATH)
+            let createAccount = {};
+            createAccount.username = document.getElementById("username").value;
+            createAccount.password = document.getElementById("passwordButton").value;
+            createAccount.name = document.getElementById("student-name").value;
+            createAccount.photo = document.getElementById("student-photo").value;
+            try {
+                let res = await fetch(PATH, {
+                    method: 'PUT',
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(createAccount)
+                })
+                if(!res.ok)
+                    throw new Error(`fetching error: ${res.status}`)
+                return res;
+            } catch(error) {
+                failed = true;
+                showError(error)
+                hideLoading()
+            }
+        }
+
+        const id = document.getElementById("student-id").value;
+        showLoading(URL+STUDENT_ENDPOINT+"/"+id)
+        await sendPut(URL+STUDENT_ENDPOINT+"/"+id);
         hideLoading()
         if(!failed)
             location.reload();
