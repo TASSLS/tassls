@@ -21,7 +21,8 @@ function hideError() {
     errorBox.style.display = 'none';
 }
 
-const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+// const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+const URL = "http://127.0.0.1:3000";
 const STUDENT_ENDPOINT = "/students";
 async function sendGet(url) {
     console.log("GETting " + url)
@@ -43,10 +44,6 @@ async function verify() {
     }
     const username = document.getElementById('username').value
     const password = document.getElementById('password').value
-    if(username == "" || password == "") {
-        invalid()
-        return;
-    }
     showLoading(URL+STUDENT_ENDPOINT + "/part/" + username)
     let students = await sendGet(URL+STUDENT_ENDPOINT + "/part/" + username);
     hideLoading()

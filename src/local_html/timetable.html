@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>TIMETABLE | TASSLS</title>
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
+        <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="timetable.css">
+        <script src="shapes.js" defer></script>
+    </head>
+    <body>
+        <header>
+            <img id="logo" src="logo.png" alt="Logo">
+        </header>
+
+        <nav>
+            <a href="./home.html">HOME</a>
+            <a href="./account.html" id="nav-account">LOGIN</a>
+            <a href="./timetable.html" class="nav-selected">TIMETABLE</a>
+        </nav>
+
+        <div id="errorBox">Error: Request failed. Please try again.</div>
+        <div class="loading-overlay" id="loadingOverlay">
+            <div id="loading-text">fetching...</div>
+        </div>
+
+        <div class="timetable-container">
+            <div class="timetable-left">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Period</th>
+                            <th>Subject</th>
+                            <th>Room</th>
+                            <th>Teacher</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Period 0</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Before School</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Home Room</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 1</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 2</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Break 1</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 3</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 4</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Break 2</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 5</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 6</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Dismissal</td>
+                        </tr>
+                    </tbody>
+                    <tbody>
+                        <tr>
+                            <td>Period 7</td>
+                            <td>Test</td>
+                            <td>Test</td>
+                            <td>Test</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="timetable-right">
+                <div class="timetable-buttons">
+                    <button>Today</button>
+                    <button>Next Day</button>
+                    <button>Previous Day</button>
+                </div>
+                <div class="timetable-buttons">
+                    <button>Full Timetable</button>
+                </div>
+            </div>
+        </div>
+
+        <section>
+            <p>TASSLS</p>
+            <p>The Alpha School System Like System</p>
+        </section>
+    </body>
+</html>

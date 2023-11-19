@@ -44,18 +44,19 @@ nav {
 }
 
 nav a {
+    text-transform: uppercase;
     text-decoration: none;
     color: white;
     margin: 0 10px;
 }
 
-nav a:hover, nav a#nav-selected:hover {
+nav a:hover, nav a.nav-selected:hover {
     color: #5782bb;
     transition: .3s ease;
 }
 
-nav a#nav-selected {
-    color: #fffdee;
+nav a.nav-selected {
+    color: #8c949e;
 }
 
 section {

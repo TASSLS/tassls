@@ -2,7 +2,8 @@ use std::error::Error;
 use axum::routing::{get, post, put, delete, Router};
 use tower_http::cors::CorsLayer;
 
-mod handlers;
+mod student;
+mod timetable;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn Error>> {
@@ -28,12 +29,14 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
     println!("server running at: {}", addr);
 
     let app = Router::new()
-        .route("/students", post(handlers::create_student))
-        .route("/students", get(handlers::read_students))
-        .route("/students/part/:username", get(handlers::read_students_name))
-        .route("/students/dao/:id", get(handlers::read_students_id))
-        .route("/students/:id", put(handlers::update_student))
-        .route("/students/:id", delete(handlers::delete_student))
+        .route("/students", post(student::create_student))
+        .route("/students", get(student::read_students))
+        .route("/students/part/:username", get(student::read_students_name))
+        .route("/students/dao/:id", get(student::read_students_id))
+        .route("/students/:id", put(student::update_student))
+        .route("/students/:id", delete(student::delete_student))
+        .route("/timetable", post(timetable::create_timetable))
+
         .layer(CorsLayer::permissive())
         .with_state(pool);
 
