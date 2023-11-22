@@ -2,7 +2,7 @@ use axum::{extract, http};
 use serde::{Serialize, Deserialize};
 use sqlx::{FromRow, PgPool};
 
-#[derive(Debug, Deserialize)]
+#[derive(Deserialize)]
 pub struct CreatePeriod {
     subject: String,
     room: String,
@@ -46,29 +46,29 @@ async fn create_day(
     periods: &[CreatePeriod],
     pool: &PgPool,
 ) -> Result<uuid::Uuid, http::StatusCode> {
-    let period_id = [uuid::Uuid::new_v4(); 10];
-
+    let mut period_id: [uuid::Uuid; 10] = Default::default();
     let mut tx = pool.begin().await.unwrap();
+
+    // whyyyy can we not use an array value to bind with????
     for (i, period) in periods.iter().enumerate() {
-        match sqlx::query(
+        let id = uuid::Uuid::new_v4();
+        period_id[i] = id;
+        if let Err(_) = sqlx::query(
             r#"
             INSERT INTO period (id, subject, room, teacher)
             VALUES ($1, $2, $3, $4)
             "#
         )
-        .bind(&period_id[i])
+        .bind(id)
         .bind(&period.subject)
         .bind(&period.room)
         .bind(&period.teacher)
         .execute(&mut *tx)
         .await {
-            Ok(_) => continue,
-            Err(_) => {
-                tx.rollback()
-                    .await
-                    .expect("Failed to rollback transaction");
-                return Err(http::StatusCode::INTERNAL_SERVER_ERROR);
-            }
+            tx.rollback()
+                .await
+                .expect("Failed to rollback transaction");
+            return Err(http::StatusCode::INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -79,17 +79,17 @@ async fn create_day(
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10)
         "#
     )
-    .bind(&day_id)
-    .bind(&period_id[0])
-    .bind(&period_id[1])
-    .bind(&period_id[2])
-    .bind(&period_id[3])
-    .bind(&period_id[4])
-    .bind(&period_id[5])
-    .bind(&period_id[6])
-    .bind(&period_id[7])
-    .bind(&period_id[8])
-    .bind(&period_id[9])
+    .bind(day_id)
+    .bind(period_id[0])
+    .bind(period_id[1])
+    .bind(period_id[2])
+    .bind(period_id[3])
+    .bind(period_id[4])
+    .bind(period_id[5])
+    .bind(period_id[6])
+    .bind(period_id[7])
+    .bind(period_id[8])
+    .bind(period_id[9])
     .execute(&mut *tx)
     .await {
         tx.rollback()
@@ -121,19 +121,23 @@ async fn create_week(
     .bind(days[4])
     .execute(pool)
     .await {
-        return Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+        return Err(http::StatusCode::INTERNAL_SERVER_ERROR);
     }
 
     Ok(week_id)
 }
 
+#[derive(Deserialize)]
+pub struct PayloadData {
+    data: Vec<CreatePeriod>
+}
+
 pub async fn create_timetable(
     extract::State(pool): extract::State<PgPool>,
-    axum::Json(payload): axum::Json<[CreatePeriod; 100]>
+    axum::Json(payload): axum::Json<PayloadData>
 ) -> Result<(http::StatusCode, axum::Json<uuid::Uuid>), http::StatusCode> {
-
     let mut days: [uuid::Uuid; 10] = Default::default();
-    for (i, day) in payload.chunks_exact(10).enumerate() {
+    for (i, day) in payload.data.chunks_exact(10).enumerate() {
         days[i] = match create_day(day, &pool).await {
             Ok(id) => id,
             Err(status) => return Err(status)
@@ -155,7 +159,7 @@ pub async fn create_timetable(
         VALUES ($1, $2, $3)
         "#
     )
-    .bind(&timetable)
+    .bind(timetable)
     .bind(weeks[0])
     .bind(weeks[1])
     .execute(&pool)
