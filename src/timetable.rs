@@ -76,7 +76,7 @@ async fn create_day(
     if let Err(_) = sqlx::query(
         r#"
         INSERT INTO day (id, period_1, period_2, period_3, period_4, period_5, period_6, period_7, period_8, period_9, period_10)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $10)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         "#
     )
     .bind(day_id)
@@ -113,7 +113,7 @@ async fn create_week(
         VALUES ($1, $2, $3, $4, $5, $6)
         "#
     )
-    .bind(&week_id)
+    .bind(week_id)
     .bind(days[0])
     .bind(days[1])
     .bind(days[2])
@@ -152,19 +152,19 @@ pub async fn create_timetable(
         };
     }
 
-    let timetable = uuid::Uuid::new_v4();
+    let timetable_id = uuid::Uuid::new_v4();
     match sqlx::query(
         r#"
         INSERT INTO timetable (id, week_1, week_2)
         VALUES ($1, $2, $3)
         "#
     )
-    .bind(timetable)
+    .bind(timetable_id)
     .bind(weeks[0])
     .bind(weeks[1])
     .execute(&pool)
     .await {
-        Ok(_) => Ok((http::StatusCode::CREATED, axum::Json(timetable))),
+        Ok(_) => Ok((http::StatusCode::CREATED, axum::Json(timetable_id))),
         Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
     }
 }
