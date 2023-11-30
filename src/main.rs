@@ -35,7 +35,9 @@ async fn start_server(pool: sqlx::PgPool) -> Result<(), Box<dyn Error>> {
         .route("/students/dao/:id", get(student::read_students_id))
         .route("/students/:id", put(student::update_student))
         .route("/students/:id", delete(student::delete_student))
+
         .route("/timetable", post(timetable::create_timetable))
+        .route("/timetable/:id", get(timetable::read_timetable))
 
         .layer(CorsLayer::permissive())
         .with_state(pool);

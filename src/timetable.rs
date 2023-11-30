@@ -2,43 +2,52 @@ use axum::{extract, http};
 use serde::{Serialize, Deserialize};
 use sqlx::{FromRow, PgPool};
 
-#[derive(Deserialize)]
+#[derive(FromRow, Deserialize, Serialize, Clone)]
 pub struct CreatePeriod {
     subject: String,
     room: String,
     teacher: String
 }
 
+// cant use CreatePeriod in Period because it cant deserialise 2 structs from json i think
+#[derive(FromRow, Serialize)]
 pub struct Period {
     id: uuid::Uuid,
-    create_period: CreatePeriod
+    subject: String,
+    room: String,
+    teacher: String
 }
 
-pub struct CreateDay {
-    periods: [Period; 10],
-}
-
+#[derive(FromRow, Serialize)]
 pub struct Day {
     id: uuid::Uuid,
-    create_day: CreateDay
+    period_1: uuid::Uuid,
+    period_2: uuid::Uuid,
+    period_3: uuid::Uuid,
+    period_4: uuid::Uuid,
+    period_5: uuid::Uuid,
+    period_6: uuid::Uuid,
+    period_7: uuid::Uuid,
+    period_8: uuid::Uuid,
+    period_9: uuid::Uuid,
+    period_10: uuid::Uuid
 }
 
-pub struct CreateWeek {
-    days:[Day; 5]
-}
-
+#[derive(FromRow, Serialize)]
 pub struct Week {
     id: uuid::Uuid,
-    create_week: CreateWeek
+    day_1: uuid::Uuid,
+    day_2: uuid::Uuid,
+    day_3: uuid::Uuid,
+    day_4: uuid::Uuid,
+    day_5: uuid::Uuid
 }
 
-pub struct CreateTimetable {
-    weeks: [Week; 2]
-}
-
+#[derive(FromRow, Serialize)]
 pub struct Timetable {
     id: uuid::Uuid,
-    create_timetable: CreateTimetable
+    week_1: uuid::Uuid,
+    week_2: uuid::Uuid
 }
 
 // TODO: perform all timetable operations atomically
@@ -127,14 +136,14 @@ async fn create_week(
     Ok(week_id)
 }
 
-#[derive(Deserialize)]
-pub struct PayloadData {
+#[derive(Deserialize, Serialize)]
+pub struct CreatePeriodData {
     data: Vec<CreatePeriod>
 }
 
 pub async fn create_timetable(
     extract::State(pool): extract::State<PgPool>,
-    axum::Json(payload): axum::Json<PayloadData>
+    axum::Json(payload): axum::Json<CreatePeriodData>
 ) -> Result<(http::StatusCode, axum::Json<uuid::Uuid>), http::StatusCode> {
     let mut days: [uuid::Uuid; 10] = Default::default();
     for (i, day) in payload.data.chunks_exact(10).enumerate() {
@@ -167,4 +176,89 @@ pub async fn create_timetable(
         Ok(_) => Ok((http::StatusCode::CREATED, axum::Json(timetable_id))),
         Err(_) => Err(http::StatusCode::INTERNAL_SERVER_ERROR)
     }
+}
+
+pub async fn read_timetable(
+    extract::State(pool): extract::State<PgPool>,
+    extract::Path(id): extract::Path<uuid::Uuid>
+) -> Result<axum::Json<CreatePeriodData>, http::StatusCode> {
+    let timetable = match sqlx::query_as::<_, Timetable>(
+        r#"
+        SELECT * FROM timetable
+        WHERE id = $1
+        "#
+    )
+    .bind(id)
+    .fetch_all(&pool)
+    .await {
+        Ok(timetable) => timetable,
+        Err(_) => return Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+    };
+
+    // should be exactly 1 result returned from db queries so constant indexing is safe
+    let mut days: [[uuid::Uuid; 5]; 2] = Default::default();
+    let timetable_weeks = [timetable[0].week_1, timetable[0].week_2];
+    for i in 0..2 {
+        days[i] = match sqlx::query_as::<_, Week>(
+            r#"
+            SELECT * FROM week
+            WHERE id = $1
+            "#
+        )
+        .bind(timetable_weeks[i])
+        .fetch_all(&pool)
+        .await {
+            Ok(week) => [week[0].day_1, week[0].day_2, week[0].day_3, week[0].day_4, week[0].day_5],
+            Err(_) => return Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+        };
+    }
+
+    // 10 days of 10 periods
+    let mut periods: [[uuid::Uuid; 10]; 10] = Default::default();
+    let mut curr_period = 0;
+    for i in 0..2 {
+        for j in 0..5 {
+            periods[curr_period] = match sqlx::query_as::<_, Day>(
+                r#"
+                SELECT * FROM day
+                WHERE id = $1
+                "#
+            )
+            .bind(days[i][j])
+            .fetch_all(&pool)
+            .await {
+                Ok(day) => [day[0].period_1, day[0].period_2, day[0].period_3, day[0].period_4, day[0].period_5, day[0].period_6, day[0].period_7, day[0].period_8, day[0].period_9, day[0].period_10],
+                Err(_) => return Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+            };
+            curr_period += 1;
+        }
+    }
+    curr_period = 0;
+
+    let mut period_data: Vec<CreatePeriod> = Vec::with_capacity(10*10);
+    for i in 0..10 {
+        for j in 0..10 {
+            period_data.push(match sqlx::query_as::<_, CreatePeriod>(
+                r#"
+                SELECT * FROM period
+                WHERE id = $1
+                "#
+            )
+            .bind(periods[i][j])
+            .fetch_all(&pool)
+            .await {
+                Ok(period) => CreatePeriod { // because period id is also returned
+                    subject: period[0].subject.clone(),
+                    room: period[0].room.clone(),
+                    teacher: period[0].teacher.clone(),
+                },
+                Err(_) => return Err(http::StatusCode::INTERNAL_SERVER_ERROR)
+            });
+            curr_period += 1;
+        }
+    }
+    let create_periods = CreatePeriodData {
+        data: period_data
+    };
+    Ok(axum::Json(create_periods))
 }
