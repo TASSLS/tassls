@@ -67,6 +67,7 @@ async function login() {
     hideLoading()
     if(typeof account == "undefined") {
         document.cookie = "account_id=;";
+        // window.open("account.html",'_self');
         document.getElementById("nav-account").click();
         return;
     }

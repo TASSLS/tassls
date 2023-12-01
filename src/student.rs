@@ -12,6 +12,16 @@ pub struct Student {
     dob: chrono::DateTime<chrono::Utc>,
     created: chrono::DateTime<chrono::Utc>,
     updated: chrono::DateTime<chrono::Utc>,
+    timetable_id: uuid::Uuid
+}
+
+#[derive(Debug, Deserialize)]
+pub struct CreateInitialStudent {
+    username: String,
+    password: String,
+    name: String,
+    photo: String,
+    timetable_id: uuid::Uuid
 }
 
 #[derive(Debug, Deserialize)]
@@ -23,7 +33,7 @@ pub struct CreateStudent {
 }
 
 impl Student {
-    fn new(student: CreateStudent) -> Self {
+    fn new(student: CreateInitialStudent) -> Self {
         let id = uuid::Uuid::new_v4();
         let now = chrono::Utc::now();
         Self {
@@ -34,26 +44,21 @@ impl Student {
             photo: student.photo,
             dob: now,
             created: now,
-            updated: now
+            updated: now,
+            timetable_id: student.timetable_id
         }
     }
 }
 
 pub async fn create_student(
     extract::State(pool): extract::State<PgPool>,
-    axum::Json(payload): axum::Json<CreateStudent>
+    axum::Json(payload): axum::Json<CreateInitialStudent>
 ) -> Result<(http::StatusCode, axum::Json<Student>), http::StatusCode> {
-    let student = Student::new(CreateStudent {
-        username: payload.username,
-        password: payload.password,
-        name: payload.name,
-        photo: payload.photo
-    });
-
+    let student = Student::new(payload);
     let res = sqlx::query(
         r#"
-        INSERT INTO students (id, username, password, name, photo, dob, created, updated)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+        INSERT INTO students (id, username, password, name, photo, dob, created, updated, timetable_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
         "#
     )
     .bind(&student.id)
@@ -64,6 +69,7 @@ pub async fn create_student(
     .bind(&student.dob)
     .bind(&student.created)
     .bind(&student.updated)
+    .bind(&student.timetable_id)
     .execute(&pool)
     .await;
 

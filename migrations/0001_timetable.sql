@@ -51,6 +51,6 @@ CREATE TABLE IF NOT EXISTS students (
     dob TIMESTAMPTZ NOT NULL,
     created TIMESTAMPTZ NOT NULL,
     updated TIMESTAMPTZ NOT NULL,
-    timetable_id UUID REFERENCES timetable(id),
+    timetable_id UUID REFERENCES timetable(id) NOT NULL,
     UNIQUE (id)
 );

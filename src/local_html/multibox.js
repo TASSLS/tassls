@@ -1,4 +1,6 @@
 // -- multiple uses for login section --
+const TIMETABLE_ENDPOINT = "/timetable";
+
 function showLoading(URL) {
     document.getElementById('loadingOverlay').style.display = 'flex';
     document.getElementById('loading-text').innerText = "fetching:\n" + URL;
@@ -120,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             let failed = false;
             async function sendPost(PATH) {
-                console.log("PUTting " + PATH)
+                console.log("POSTing " + PATH)
                 let createAccount = {};
                 createAccount.username = document.getElementById("student-username").value;
                 createAccount.password = document.getElementById("student-password").value;
@@ -184,6 +186,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
     const URL = "http://127.0.0.1:3000";
     const STUDENT_ENDPOINT = "/students";
+
     async function sendGet(url) {
         console.log("GETting " + url)
         try {
@@ -254,7 +257,6 @@ document.addEventListener('DOMContentLoaded', async function() {
             location.reload();
         });
 
-
         formleft.appendChild(nameLabel);
         formleft.appendChild(nameInput);
         formleft.appendChild(photoLabel);
@@ -317,6 +319,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         userUpdatedInput.value = account.updated;
         userUpdatedInput.readOnly = true;
 
+        const userTimetableLabel = document.createElement('label');
+        userTimetableLabel.textContent = 'Timetable:';
+        const userTimetableInput = document.createElement('input');
+        userTimetableInput.type = 'text';
+        userTimetableInput.id = 'student-timetable';
+        userTimetableInput.name = 'timetable';
+        userTimetableInput.value = account.timetable_id;
+        userTimetableInput.readOnly = true;
+
         const changePasswordButton = document.createElement('button');
         changePasswordButton.type = 'button';
         changePasswordButton.textContent = 'Change Password';
@@ -333,6 +344,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         formRight.appendChild(userCreatedInput);
         formRight.appendChild(userUpdatedLabel);
         formRight.appendChild(userUpdatedInput);
+        formRight.appendChild(userTimetableLabel);
+        formRight.appendChild(userTimetableInput);
         formRight.appendChild(changePasswordButton);
 
         rightHalf.appendChild(formRight);
