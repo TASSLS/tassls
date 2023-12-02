@@ -112,7 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
         async function createAccount() {
             async function populateTimetable(PATH) {
                 console.log("POSTing " + PATH)
-                let yearGroup = Math.floor(Math.random() * (12 - 7) + 7);
+                // const yearGroup = Math.floor(Math.random() * (12 - 7) + 7);
+                const yearGroup = 12;
                 let timetable_id;
                 const delim = "_";
                 let classPool = [
@@ -123,7 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     ["Mathematics", "English", "History", "Business", "Economics", "Photography", "Biology", "Physics", "Chemistry", "Study", "Visual Arts"], // 11
                     ["Mathematics", "English", "History", "Chemistry", "Business", "Economics", "Biology", "Physics", "Study", "Visual Arts"], // 12
                     ["Extension Mathematics", "Extension English"], // 11 Morning
-                    ["Extension Mathematics 1", "Extension English 1", "Extension Mathematics 2", "Extension English 2"] // 12 Morning
+                    ["Extension Mathematics 1", "Extension English 1", "Extension Mathematics 2", "Extension English 2"], // 12 Morning
+                    ["Homeroom"] // Misc
                 ];
                 let blockPool = ['j', 'q', 'o', 'd', 'i', 's', 'm', 'e'];
                 blockPool = blockPool.map((block) => block.toUpperCase());
@@ -138,19 +140,41 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 let data = [];
+                const extensionDay = Math.floor(Math.random() * 13)
+                const extensionClass = (yearGroup + " " + classPool[yearGroup-5][Math.floor(Math.random() * (classPool[yearGroup - 5].length-1))]).split(delim);
+                let again = 0;
                 for(let i = 0; i < 100; i++) {
                     let chosenClass = Math.floor(Math.random() * (classPool[yearGroup - 7].length-1));
                     let period = (yearGroup + " " + classPool[yearGroup - 7][chosenClass]).split(delim);
 
-                    let specials = period[0];
-                    // if(Number.isInteger((i-3)/13))
-                    //     specials = "Homeroom"
-                    // else if((yearGroup == 11 || yearGroup == 12) && (Number.isInteger((i-2)/13) || Number.isInteger((i-1)/13)))
-                    //     specials = yearGroup + " " + classPool[yearGroup-5][Math.floor(Math.random() * (classPool[yearGroup - 5].length-1))].split(delim)[0];
                     data[i] = {
-                        subject: specials,
+                        subject: period[0],
                         room: period[1],
                         teacher: period[2]
+                    }
+
+                    if(Number.isInteger(((i+1)-3)/10)) {
+                        let homeroom = (yearGroup + " " + classPool[classPool.length-1][0]).split(delim);
+                        data[i] = {
+                            subject: homeroom[0],
+                            room: homeroom[1],
+                            teacher: homeroom[2]
+                        }
+                    }
+                    if(Number.isInteger(((i+1)-2)/10) || Number.isInteger(((i+1)-1)/10)) {
+                        data[i] = {
+                            subject: "N/A",
+                            room: "N/A",
+                            teacher: "N/A"
+                        }
+                        if((yearGroup == 11 || yearGroup == 12) && (((i/10) % extensionDay == 0 || (i/10) % extensionDay == 3) || again)) {
+                            again = !again;
+                            data[i] = {
+                                subject: extensionClass[0],
+                                room: extensionClass[1],
+                                teacher: extensionClass[2]
+                            }
+                        }
                     }
                 }
                 let timetable = {};
