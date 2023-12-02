@@ -84,12 +84,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     createPeriods(timetable.data);
 });
 
+var week = 0;
 function getWeekdayValue(date) {
-    const dayOfWeek = date.getDay();
-    if(dayOfWeek == 0 || dayOfWeek == 6) // weekends
-        return -1;
-    const dayWithinFortnight = (dayOfWeek + date.getDate() - 1) % 10;
-    return dayWithinFortnight;
+    let start = new Date(date.getFullYear(), 0, 0);
+    let diff = (date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
+    let oneDay = 1000 * 60 * 60 * 24;
+    let day = Math.floor(diff / oneDay);
+
+    const map = [[-1, 0, 1, 2, 3, 4, -1], [-1, 5, 6, 7, 8, 9, -1]];
+    if(day % 7 == 0)
+        week++;
+    return map[week&1][date.getDay()];
 }
 
 let timetableButton;
@@ -97,7 +102,7 @@ let day = new Date();
 function createPeriods(timetable) {
     document.querySelectorAll('.extra').forEach(e => e.remove());
     const timetableDay = getWeekdayValue(day);
-    document.getElementById("timetable-heading").innerText = "Timetable for " + day.toString().slice(0, 15) + " (" + timetableDay + "/10)";
+    document.getElementById("timetable-heading").innerText = "Timetable for " + day.toString().slice(0, 15) + " (" + (timetableDay+1) + "/10)";
     const index = timetableDay*10;
     for(let i = 0; i < 10; i++) {
         // weekend

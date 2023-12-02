@@ -114,12 +114,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log("POSTing " + PATH)
                 let yearGroup = Math.floor(Math.random() * (12 - 7) + 7);
                 let timetable_id;
+                const delim = "_";
+                let classPool = [
+                    ["Mathematics", "ConnectED", "Religion", "Languages", "Technology", "Music", "Drama", "Visual Arts", "Science"], // 7
+                    ["Mathematics", "English", "History", "Languages", "Technology", "Music", "Drama", "Geography", "Science", "Visual Arts"], // 8
+                    ["Mathematics", "English", "History", "Technology", "Languages", "Science", "Visual Arts"], // 9
+                    ["Mathematics", "English", "History", "Technology", "Languages", "Photography", "IST", "Commerce", "Global Studies", "Science", "Visual Arts"], // 10
+                    ["Mathematics", "English", "History", "Business", "Economics", "Photography", "Biology", "Physics", "Chemistry", "Study", "Visual Arts"], // 11
+                    ["Mathematics", "English", "History", "Chemistry", "Business", "Economics", "Biology", "Physics", "Study", "Visual Arts"], // 12
+                    ["Extension Mathematics", "Extension English"], // 11 Morning
+                    ["Extension Mathematics 1", "Extension English 1", "Extension Mathematics 2", "Extension English 2"] // 12 Morning
+                ];
+                let blockPool = ['j', 'q', 'o', 'd', 'i', 's', 'm', 'e'];
+                blockPool = blockPool.map((block) => block.toUpperCase());
+                const teacherPool = ["Green", "Dark Green", "Light Green", "Chartreuse", "Juniper", "Sage", "Lime", "Fern", "Olive", "Emerald", "Pear", "Moss", "Shamrock", "Seafoam", "Pine", "Parakeet", "Mint", "Seaweed", "Pickle", "Pistachio", "Basil", "Crocodile", "Olive", "Castelon", "Emerald", "Forest", "Apple", "Jade", "Lawn", "Blue"];
+                const titlePool = ["Ms.", "Miss", "Mrs.", "Mr.", "Dr.", "Prof."];
+                const height = 3;
+                const width = 8;
+                for(let i = 0; i < classPool.length; i++) {
+                    for(let j = 0; j < classPool[i].length; j++) {
+                        classPool[i][j] += delim + blockPool[Math.floor(Math.random() * (blockPool.length-1))] + Math.floor(Math.random() * (height-1) + 1) + "0" + Math.floor(Math.random() * width); // append room
+                        classPool[i][j] += delim + titlePool[Math.floor(Math.random() * (titlePool.length-1))] + " " + teacherPool[Math.floor(Math.random() * (teacherPool.length-1))]; // append teacher
+                    }
+                }
                 let data = [];
                 for(let i = 0; i < 100; i++) {
+                    let chosenClass = Math.floor(Math.random() * (classPool[yearGroup - 7].length-1));
+                    let period = (yearGroup + " " + classPool[yearGroup - 7][chosenClass]).split(delim);
+
+                    let specials = period[0];
+                    // if(Number.isInteger((i-3)/13))
+                    //     specials = "Homeroom"
+                    // else if((yearGroup == 11 || yearGroup == 12) && (Number.isInteger((i-2)/13) || Number.isInteger((i-1)/13)))
+                    //     specials = yearGroup + " " + classPool[yearGroup-5][Math.floor(Math.random() * (classPool[yearGroup - 5].length-1))].split(delim)[0];
                     data[i] = {
-                        subject: yearGroup + " Math",
-                        room: "j202",
-                        teacher: "ms tassls"
+                        subject: specials,
+                        room: period[1],
+                        teacher: period[2]
                     }
                 }
                 let timetable = {};
