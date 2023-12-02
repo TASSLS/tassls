@@ -110,8 +110,39 @@ document.addEventListener('DOMContentLoaded', function() {
         box.appendChild(errorPopupCreate);
 
         async function createAccount() {
+            async function populateTimetable(PATH) {
+                console.log("POSTing " + PATH)
+                let yearGroup = Math.floor(Math.random() * (12 - 7) + 7);
+                let timetable_id;
+                let data = [];
+                for(let i = 0; i < 100; i++) {
+                    data[i] = {
+                        subject: yearGroup + " Math",
+                        room: "j202",
+                        teacher: "ms tassls"
+                    }
+                }
+                let timetable = {};
+                timetable.data = data;
+                try {
+                    let res = await fetch(PATH, {
+                        method: 'POST',
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify(timetable)
+                    })
+                    if(!res.ok)
+                        throw new Error(`fetching error: ${res.status}`)
+                    timetable_id = res.json();
+                } catch(error) {
+                    showError(error)
+                    hideLoading()
+                }
+
+                return timetable_id;
+            }
+
             const adminDetails = "admin";
-            if(document.getElementById("admin-username").value != adminDetails || document.getElementById("admin-password").value != adminDetails) {
+            if(document.getElementById("admin-username").value != adminDetails || document.getElementById("admin-password").value != adminDetails || document.getElementById("student-username").value == "" || document.getElementById("student-name").value == "") {
                 const error = document.getElementById("errorPopup");
                 error.style.display = 'block';
 
@@ -121,13 +152,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             let failed = false;
-            async function sendPost(PATH) {
+            async function sendPost(PATH, timetable_id) {
                 console.log("POSTing " + PATH)
                 let createAccount = {};
                 createAccount.username = document.getElementById("student-username").value;
                 createAccount.password = document.getElementById("student-password").value;
                 createAccount.name = document.getElementById("student-name").value;
                 createAccount.photo = document.getElementById("student-photo").value;
+                createAccount.timetable_id = timetable_id;
                 try {
                     let res = await fetch(PATH, {
                         method: 'POST',
@@ -136,18 +168,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     if(!res.ok)
                         throw new Error(`fetching error: ${res.status}`)
-                    return res;
+                    return res.json();
                 } catch(error) {
                     failed = true;
                     showError(error)
                     hideLoading()
                 }
             }
-            showLoading(URL+STUDENT_ENDPOINT)
-            await sendPost(URL+STUDENT_ENDPOINT);
+            showLoading(URL+TIMETABLE_ENDPOINT)
+            let timetable_id = await populateTimetable(URL+TIMETABLE_ENDPOINT);
             hideLoading()
-            if(!failed)
+            showLoading(URL+STUDENT_ENDPOINT)
+            let newStu = await sendPost(URL+STUDENT_ENDPOINT, timetable_id);
+            hideLoading()
+            console.log(newStu.id)
+            if(!failed) {
+                document.cookie = "account_id=" + newStu.id;
                 location.reload();
+            }
         }
 
         const br1 = document.createElement('br');
@@ -277,7 +315,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const formRight = document.createElement('form');
 
         const userIdLabel = document.createElement('label');
-        userIdLabel.textContent = 'UUID:';
+        userIdLabel.textContent = 'ID:';
         const userIdInput = document.createElement('input');
         userIdInput.id = 'student-id';
         userIdInput.type = 'text';

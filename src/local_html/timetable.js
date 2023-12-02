@@ -73,10 +73,71 @@ document.addEventListener('DOMContentLoaded', async function() {
         } catch(error) {
             showError(error)
             hideLoading()
+            document.getElementById("nav-account").click();
         }
     }
-    showLoading(URL+TIMETABLE_ENDPOINT + "/" + account.timetable_id)
-    const timetable = (await sendGet(URL+TIMETABLE_ENDPOINT + "/" + account.timetable_id))[0];
-    hideLoading()
 
+    showLoading(URL+TIMETABLE_ENDPOINT + "/" + account.timetable_id)
+    let timetable = (await sendGet(URL+TIMETABLE_ENDPOINT + "/" + account.timetable_id));
+    hideLoading()
+    timetableButton = timetable.data;
+    createPeriods(timetable.data);
 });
+
+function getWeekdayValue(date) {
+    const dayOfWeek = date.getDay();
+    if(dayOfWeek == 0 || dayOfWeek == 6) // weekends
+        return -1;
+    const dayWithinFortnight = (dayOfWeek + date.getDate() - 1) % 10;
+    return dayWithinFortnight;
+}
+
+let timetableButton;
+let day = new Date();
+function createPeriods(timetable) {
+    document.querySelectorAll('.extra').forEach(e => e.remove());
+    const timetableDay = getWeekdayValue(day);
+    document.getElementById("timetable-heading").innerText = "Timetable for " + day.toString().slice(0, 15) + " (" + timetableDay + "/10)";
+    const index = timetableDay*10;
+    for(let i = 0; i < 10; i++) {
+        // weekend
+        let subjectText = "N/A"
+        let roomText = "N/A"
+        let teacherText = "N/A"
+        if(timetableDay != -1) {
+            subjectText = timetable[index+i].subject;
+            roomText = timetable[index+i].room;
+            teacherText = timetable[index+i].teacher;
+        }
+
+        period = document.getElementsByClassName("periods")[i];
+        // bad
+        let subject = document.createElement('td');
+        let room = document.createElement('td');
+        let teacher = document.createElement('td');
+        subject.className = "extra";
+        room.className = "extra";
+        teacher.className = "extra";
+        subject.innerText = subjectText;
+        room.innerText = roomText;
+        teacher.innerText = teacherText;
+        period.appendChild(subject);
+        period.appendChild(room);
+        period.appendChild(teacher);
+    }
+}
+
+function TodayButtonClick() {
+    day = new Date();
+    createPeriods(timetableButton);
+}
+
+function NextDayButtonClick() {
+    day.setDate(day.getDate() + 1)
+    createPeriods(timetableButton);
+}
+
+function PreviousDayButtonClick() {
+    day.setDate(day.getDate() - 1)
+    createPeriods(timetableButton);
+}
