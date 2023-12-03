@@ -1,5 +1,6 @@
 .timetable-container {
     display: flex;
+    flex: wrap;
     margin: 20px;
 }
 
@@ -66,22 +67,52 @@ th:nth-child(4), td:nth-child(4) {
 }
 
 .tooltip {
-  position: relative;
-  border-bottom: none;
+    position: relative;
+    border-bottom: none;
 }
 
 .tooltip .tooltiptext {
-  visibility: hidden;
-  width: 165px;
-  background-color: #333;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
-  position: absolute;
-  z-index: 1;
+    visibility: hidden;
+    width: 165px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
 }
 
 .tooltip:hover .tooltiptext {
-  visibility: visible;
+    visibility: visible;
+}
+
+.toggle-slider {
+    cursor: pointer;
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+    background-color: #ccc;
+    border-radius: 15px;
+}
+
+.toggle-slider:before {
+    content: '';
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: white;
+    top: 2px;
+    left: 2px;
+    transition: 0.3s;
+}
+
+.toggle-slider.active {
+    background-color: #5782bb;
+}
+
+.toggle-slider.active:before {
+    transform: translateX(24px);
 }

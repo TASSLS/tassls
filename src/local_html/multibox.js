@@ -88,6 +88,22 @@ document.addEventListener('DOMContentLoaded', function() {
         form.appendChild(studentNameLabel);
         form.appendChild(studentNameInput);
 
+        const studentGenderLabel = document.createElement('label');
+        studentGenderLabel.textContent = 'Student gender:';
+        const genderOptions = ["Female", "Male"];
+        const studentGenderInput = document.createElement('select');
+        for (const option of genderOptions) {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.textContent = option;
+            studentGenderInput.appendChild(optionElement);
+        }
+        studentGenderInput.id = 'student-gender';
+        studentGenderInput.type = 'text';
+        studentGenderInput.name = 'studentGender';
+        form.appendChild(studentGenderLabel);
+        form.appendChild(studentGenderInput);
+
         const studentPhotoLabel = document.createElement('label');
         studentPhotoLabel.textContent = 'Student Photo (URL):';
         const studentPhotoInput = document.createElement('input');
@@ -97,23 +113,53 @@ document.addEventListener('DOMContentLoaded', function() {
         form.appendChild(studentPhotoLabel);
         form.appendChild(studentPhotoInput);
 
+        const populateButton = document.createElement('button');
+        populateButton.type = 'button';
+        populateButton.textContent = 'Populate Using Randomapi';
+        form.appendChild(populateButton);
+        populateButton.addEventListener('click', populateFields)
+        box.appendChild(form);
+
+        form.appendChild(document.createElement('p'));
+
         const submitButton = document.createElement('button');
         submitButton.type = 'button';
         submitButton.textContent = 'Create Student Account';
         form.appendChild(submitButton);
         submitButton.addEventListener('click', createAccount)
-        box.appendChild(form);
-        const br = document.createElement('br');
-        box.appendChild(br);
 
         const errorPopupCreate = errorPopup.cloneNode(true);
         box.appendChild(errorPopupCreate);
 
+        async function populateFields() {
+            const RANDOM = "https://randomuser.me/api/";
+            async function sendGet(url) {
+                console.log("GETting " + url)
+                try {
+                    let res = await fetch(url)
+                    if(!res.ok)
+                        throw new Error(`fetching error: ${res.status}`)
+                    return res.json();
+                } catch(error) {
+                    showError(error)
+                    hideLoading()
+                }
+            }
+            showLoading(RANDOM)
+            let person = (await sendGet(RANDOM)).results[0];
+            hideLoading()
+
+            document.getElementById("student-username").value = person.name.last[0] + person.name.first;
+            document.getElementById("student-password").value = person.login.password;
+            document.getElementById("student-name").value = person.name.first;
+            document.getElementById("student-gender").selectedIndex = !("male" > person.gender);
+            document.getElementById("student-photo").value = person.picture.large;
+        }
+
         async function createAccount() {
             async function populateTimetable(PATH) {
                 console.log("POSTing " + PATH)
-                // const yearGroup = Math.floor(Math.random() * (12 - 7) + 7);
-                const yearGroup = 12;
+                const yearGroup = Math.floor(Math.random() * (12 - 7) + 7);
                 let timetable_id;
                 const delim = "_";
                 let classPool = [
@@ -125,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ["Mathematics", "English", "History", "Chemistry", "Business", "Economics", "Biology", "Physics", "Study", "Visual Arts"], // 12
                     ["Extension Mathematics", "Extension English"], // 11 Morning
                     ["Extension Mathematics 1", "Extension English 1", "Extension Mathematics 2", "Extension English 2"], // 12 Morning
-                    ["Homeroom"] // Misc
+                    ["Homeroom", "Tutoring"] // Misc
                 ];
                 let blockPool = ['j', 'q', 'o', 'd', 'i', 's', 'm', 'e'];
                 blockPool = blockPool.map((block) => block.toUpperCase());
@@ -135,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const width = 8;
                 for(let i = 0; i < classPool.length; i++) {
                     for(let j = 0; j < classPool[i].length; j++) {
-                        classPool[i][j] += delim + blockPool[Math.floor(Math.random() * (blockPool.length-1))] + Math.floor(Math.random() * (height-1) + 1) + "0" + Math.floor(Math.random() * width); // append room
+                        classPool[i][j] += delim + blockPool[Math.floor(Math.random() * (blockPool.length-1))] + Math.floor(Math.random() * (height-1) + 1) + "0" + Math.floor(Math.random() * (width-1) + 1); // append room
                         classPool[i][j] += delim + titlePool[Math.floor(Math.random() * (titlePool.length-1))] + " " + teacherPool[Math.floor(Math.random() * (teacherPool.length-1))]; // append teacher
                     }
                 }
@@ -161,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             teacher: homeroom[2]
                         }
                     }
-                    if(Number.isInteger(((i+1)-2)/10) || Number.isInteger(((i+1)-1)/10)) {
+                    else if(Number.isInteger(((i+1)-2)/10) || Number.isInteger(((i+1)-1)/10)) {
                         data[i] = {
                             subject: "N/A",
                             room: "N/A",
@@ -173,6 +219,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                 subject: extensionClass[0],
                                 room: extensionClass[1],
                                 teacher: extensionClass[2]
+                            }
+                        }
+                    }
+                    else if(Number.isInteger(((i+1)-10)/10)) {
+                        data[i] = {
+                            subject: "N/A",
+                            room: "N/A",
+                            teacher: "N/A"
+                        }
+                        if(Math.random() > .8) {
+                            let afterSchool = (yearGroup + " " + classPool[classPool.length-1][1]).split(delim);
+                            data[i] = {
+                                subject: afterSchool[0],
+                                room: afterSchool[1],
+                                teacher: afterSchool[2]
                             }
                         }
                     }
@@ -213,6 +274,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 createAccount.username = document.getElementById("student-username").value;
                 createAccount.password = document.getElementById("student-password").value;
                 createAccount.name = document.getElementById("student-name").value;
+                createAccount.gender = !!(document.getElementById("student-gender").selectedIndex);
                 createAccount.photo = document.getElementById("student-photo").value;
                 createAccount.timetable_id = timetable_id;
                 try {
@@ -236,7 +298,6 @@ document.addEventListener('DOMContentLoaded', function() {
             showLoading(URL+STUDENT_ENDPOINT)
             let newStu = await sendPost(URL+STUDENT_ENDPOINT, timetable_id);
             hideLoading()
-            console.log(newStu.id)
             if(!failed) {
                 document.cookie = "account_id=" + newStu.id;
                 location.reload();
@@ -333,6 +394,34 @@ document.addEventListener('DOMContentLoaded', async function() {
         photoInput.photo = 'photo';
         photoInput.value = account.photo;
         photoInput.readOnly = true;
+        const photoContainer = document.createElement('div'); // Create a container div
+        photoContainer.id = 'photo-container';
+        async function loadPhoto() {
+
+            const url = account.photo;
+
+            try {
+                const options = {
+                    method: "GET"
+                }
+                let response = await fetch(url, options)
+                const imageBlob = await response.blob()
+                const imageObjectURL = window.URL.createObjectURL(imageBlob);
+
+                const image = document.createElement('img')
+                image.style.maxWidth = image.style.maxHeight = "300px";
+                image.src = imageObjectURL
+
+                const container = document.getElementById("photo-container")
+                container.append(image)
+                if(!response.ok)
+                    throw new Error(`fetching error: ${response.status}`)
+            }
+            catch(error) {
+                showError(error + " (photo image)")
+            }
+        }
+
 
         const dobLabel = document.createElement('label');
         dobLabel.textContent = 'DOB:';
@@ -354,9 +443,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         formleft.appendChild(nameInput);
         formleft.appendChild(photoLabel);
         formleft.appendChild(photoInput);
+        formleft.appendChild(photoContainer);
         formleft.appendChild(dobLabel);
         formleft.appendChild(dobInput);
         formleft.appendChild(logoutButton);
+        loadPhoto();
 
         leftHalf.appendChild(formleft);
 

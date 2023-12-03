@@ -84,7 +84,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     createPeriods(timetable.data);
 });
 
+function dateDiffInDays(a, b) {
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+}
+
 var week = 0;
+var skip = 0;
 function getWeekdayValue(date) {
     let start = new Date(date.getFullYear(), 0, 0);
     let diff = (date - start) + ((start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000);
@@ -94,7 +103,7 @@ function getWeekdayValue(date) {
     const map = [[-1, 0, 1, 2, 3, 4, -1], [-1, 5, 6, 7, 8, 9, -1]];
     if(day % 7 == 0)
         week++;
-    return map[week&1][date.getDay()];
+    return [map[week&1][date.getDay()], dateDiffInDays(new Date(), date)];
 }
 
 let timetableButton;
@@ -102,14 +111,17 @@ let day = new Date();
 function createPeriods(timetable) {
     document.querySelectorAll('.extra').forEach(e => e.remove());
     const timetableDay = getWeekdayValue(day);
-    document.getElementById("timetable-heading").innerText = "Timetable for " + day.toString().slice(0, 15) + " (" + (timetableDay+1) + "/10)";
-    const index = timetableDay*10;
+    let sign = "";
+    if(timetableDay[1] > 0)
+        sign = "+";
+    document.getElementById("timetable-heading").innerText = "Timetable for " + day.toString().slice(0, 15) + " (" + (timetableDay[0]+1) + "/10)" + " " + sign + timetableDay[1];
+    const index = timetableDay[0]*10;
     for(let i = 0; i < 10; i++) {
         // weekend
         let subjectText = "N/A"
         let roomText = "N/A"
         let teacherText = "N/A"
-        if(timetableDay != -1) {
+        if(timetableDay[0] != -1) {
             subjectText = timetable[index+i].subject;
             roomText = timetable[index+i].room;
             teacherText = timetable[index+i].teacher;
@@ -139,10 +151,24 @@ function TodayButtonClick() {
 
 function NextDayButtonClick() {
     day.setDate(day.getDate() + 1)
+    for(i = 0; skip && (day.getDay() == 0 || day.getDay() == 6); i++) {
+        day.setDate(day.getDate() + 1)
+        week+=i;
+    }
     createPeriods(timetableButton);
 }
 
 function PreviousDayButtonClick() {
     day.setDate(day.getDate() - 1)
+    for(i = 0; skip && (day.getDay() == 0 || day.getDay() == 6); i++) {
+        day.setDate(day.getDate() - 1)
+        week+=i;
+    }
     createPeriods(timetableButton);
+}
+
+function toggleSlider() {
+    const slider = document.querySelector('.toggle-slider');
+    slider.classList.toggle('active');
+    skip = !skip;
 }
