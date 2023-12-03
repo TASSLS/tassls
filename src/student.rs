@@ -8,6 +8,7 @@ pub struct Student {
     username: String,
     password: String,
     name: String,
+    gender: bool,
     photo: String,
     dob: chrono::DateTime<chrono::Utc>,
     created: chrono::DateTime<chrono::Utc>,
@@ -20,6 +21,7 @@ pub struct CreateInitialStudent {
     username: String,
     password: String,
     name: String,
+    gender: bool,
     photo: String,
     timetable_id: uuid::Uuid
 }
@@ -41,6 +43,7 @@ impl Student {
             username: student.username,
             password: student.password,
             name: student.name,
+            gender: student.gender,
             photo: student.photo,
             dob: now,
             created: now,
@@ -57,19 +60,20 @@ pub async fn create_student(
     let student = Student::new(payload);
     let res = sqlx::query(
         r#"
-        INSERT INTO students (id, username, password, name, photo, dob, created, updated, timetable_id)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        INSERT INTO students (id, username, password, name, gender, photo, dob, created, updated, timetable_id)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         "#
     )
-    .bind(&student.id)
+    .bind(student.id)
     .bind(&student.username)
     .bind(&student.password)
     .bind(&student.name)
+    .bind(student.gender)
     .bind(&student.photo)
     .bind(&student.dob)
     .bind(&student.created)
     .bind(&student.updated)
-    .bind(&student.timetable_id)
+    .bind(student.timetable_id)
     .execute(&pool)
     .await;
 

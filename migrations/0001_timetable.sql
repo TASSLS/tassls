@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS students (
     username VARCHAR NOT NULL,
     password VARCHAR NOT NULL,
     name VARCHAR NOT NULL,
+    gender BOOL NOT NULL,
     photo VARCHAR NOT NULL,
     dob TIMESTAMPTZ NOT NULL,
     created TIMESTAMPTZ NOT NULL,
