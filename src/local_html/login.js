@@ -21,8 +21,7 @@ function hideError() {
     errorBox.style.display = 'none';
 }
 
-// const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
-const URL = "http://127.0.0.1:3000";
+const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
 const STUDENT_ENDPOINT = "/students";
 async function sendGet(url) {
     console.log("GETting " + url)
@@ -75,10 +74,11 @@ async function login() {
 }
 
 window.addEventListener('load', () => {
-    if(typeof getCookie("account_id") == "undefined" || getCookie("account_id") != "") {
+    if(typeof getCookie("account_id") == "undefined" || getCookie("account_id") != "") { // wac
         login();
         return;
-    }})
+    }
+});
 
 
 function invalid() {

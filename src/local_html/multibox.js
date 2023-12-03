@@ -337,8 +337,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById("loginSignupBox").remove();
     document.getElementById("admin-control-center").style.display = "flex";
 
-    // const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
-    const URL = "http://127.0.0.1:3000";
+    const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
     const STUDENT_ENDPOINT = "/students";
 
     async function sendGet(url) {
@@ -396,32 +395,12 @@ document.addEventListener('DOMContentLoaded', async function() {
         photoInput.readOnly = true;
         const photoContainer = document.createElement('div'); // Create a container div
         photoContainer.id = 'photo-container';
-        async function loadPhoto() {
-
-            const url = account.photo;
-
-            try {
-                const options = {
-                    method: "GET"
-                }
-                let response = await fetch(url, options)
-                const imageBlob = await response.blob()
-                const imageObjectURL = window.URL.createObjectURL(imageBlob);
-
-                const image = document.createElement('img')
-                image.style.maxWidth = image.style.maxHeight = "300px";
-                image.src = imageObjectURL
-
-                const container = document.getElementById("photo-container")
-                container.append(image)
-                if(!response.ok)
-                    throw new Error(`fetching error: ${response.status}`)
-            }
-            catch(error) {
-                showError(error + " (photo image)")
-            }
-        }
-
+        const image = document.createElement('img')
+        image.style.maxWidth = image.style.maxHeight = "1000px";
+        image.src = account.photo;
+        image.style = "border-radius: 100%";
+        image.alt = account.name + " Photo";
+        photoContainer.append(image);
 
         const dobLabel = document.createElement('label');
         dobLabel.textContent = 'DOB:';
@@ -447,7 +426,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         formleft.appendChild(dobLabel);
         formleft.appendChild(dobInput);
         formleft.appendChild(logoutButton);
-        loadPhoto();
 
         leftHalf.appendChild(formleft);
 
