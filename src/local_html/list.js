@@ -45,8 +45,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     const id = getCookie("account_id");
     if(typeof id != "undefined" && document.cookie != "" && id != "") {
-        showLoading(URL+STUDENT_ENDPOINT + "/" + id)
-        let student = await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + id)[0];
+        showLoading(URL+STUDENT_ENDPOINT + "/dao/" + id)
+        let student = await sendGet(URL+STUDENT_ENDPOINT + "/dao/" + id);
         hideLoading()
         if(typeof student == "undefined") {
             document.cookie = "account_id=;";
