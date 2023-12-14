@@ -402,6 +402,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         image.alt = account.name + " Photo";
         photoContainer.append(image);
 
+        const genderLabel = document.createElement('label');
+        genderLabel.textContent = 'gender:';
+        const genderInput = document.createElement('input');
+        genderInput.type = 'text';
+        genderInput.gender = 'gender';
+        genderInput.value = account.gender ? "Male" : "Female";
+        genderInput.readOnly = true;
+
         const dobLabel = document.createElement('label');
         dobLabel.textContent = 'DOB:';
         const dobInput = document.createElement('input');
@@ -420,6 +428,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         formleft.appendChild(nameLabel);
         formleft.appendChild(nameInput);
+        formleft.appendChild(genderLabel);
+        formleft.appendChild(genderInput);
         formleft.appendChild(photoLabel);
         formleft.appendChild(photoInput);
         formleft.appendChild(photoContainer);
