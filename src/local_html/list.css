@@ -83,3 +83,7 @@ section {
     background-color: #5782bb;
     transition: .3s ease;
 }
+
+#unseen {
+    display: none;
+}

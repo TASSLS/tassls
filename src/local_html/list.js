@@ -19,8 +19,7 @@ function hideError() {
     errorBox.style.display = 'none';
 }
 
-// const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
-const URL = "http://127.0.0.1:3000";
+const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
 const TIMETABLE_ENDPOINT = "/timetable";
 const STUDENT_ENDPOINT = "/students";
 
@@ -100,6 +99,20 @@ function createUserCard(user) {
 
         studentInfo.appendChild(name);
         studentInfo.appendChild(id);
+
+        const unseen = document.getElementById('unseen');
+        const nameU = document.createElement('p');
+        nameU.textContent = user.name;
+        unseen.appendChild(nameU);
+        const gender = document.createElement('p');
+        gender.textContent = user.gender;
+        unseen.appendChild(gender);
+        const dob = document.createElement('p');
+        dob.textContent = user.dob;
+        unseen.appendChild(dob);
+        const created = document.createElement('p');
+        created.textContent = user.created;
+        unseen.appendChild(created);
     }
 
     const buttons = document.createElement('div');
@@ -155,22 +168,18 @@ async function handleRemove(id) {
         location.reload();
 }
 
-function tableCreate(amount) {
+function tableCreate() {
     var tbl = document.createElement('table');
     tbl.id = "table-print";
     tbl.style.width = '100%';
     tbl.setAttribute('border', '1');
-    var tbdy = document.createElement('tbody');
 
     return tbl
 }
 
-document.getElementById("print").onclick= async() => {
-    showLoading(URL+STUDENT_ENDPOINT)
-    let students = (await sendGet(URL+STUDENT_ENDPOINT));
-    hideLoading()
-
+function printP() {
     let save = document.body;
+    let students = document.getElementById("unseen").children;
 
     document.body.outerHTML = '';
     document.body.appendChild(tableCreate());
@@ -186,20 +195,20 @@ document.getElementById("print").onclick= async() => {
     let joinedH = header.insertCell();
     joinedH.appendChild(document.createTextNode("joined"))
 
-    for (const student of students) {
+    for(let i = 0; i < students.length; i+=4) {
         const row = table.insertRow()
 
         let name = row.insertCell();
-        name.appendChild(document.createTextNode(student.name))
+        name.appendChild(document.createTextNode(students[i].innerHTML))
 
         let gender = row.insertCell();
-        gender.appendChild(document.createTextNode(student.gender ? "Male" : "Female"))
+        gender.appendChild(document.createTextNode(students[i+1].innerHTML == "true" ? "Male" : "Female"))
 
         let dob = row.insertCell();
-        dob.appendChild(document.createTextNode(student.dob))
+        dob.appendChild(document.createTextNode(students[i+2].innerHTML))
 
         let created = row.insertCell();
-        created.appendChild(document.createTextNode(student.created))
+        created.appendChild(document.createTextNode(students[i+3].innerHTML))
     }
 
     window.print();
