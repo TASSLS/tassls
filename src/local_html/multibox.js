@@ -337,7 +337,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     document.getElementById("loginSignupBox").remove();
     document.getElementById("admin-control-center").style.display = "flex";
 
-    const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+    // const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+    const URL = "http://127.0.0.1:3000";
     const STUDENT_ENDPOINT = "/students";
 
     async function sendGet(url) {

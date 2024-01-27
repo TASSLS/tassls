@@ -19,7 +19,8 @@ function hideError() {
     errorBox.style.display = 'none';
 }
 
-const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+// const URL = "https://tassls-dev-ghkk.1.us-1.fl0.io";
+const URL = "http://127.0.0.1:3000";
 const TIMETABLE_ENDPOINT = "/timetable";
 const STUDENT_ENDPOINT = "/students";
 
@@ -29,20 +30,20 @@ function getCookie(name) {
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-    async function sendGet(url) {
-        console.log("GETting " + url)
-        try {
-            let res = await fetch(url)
-            if(!res.ok)
-                throw new Error(`fetching error: ${res.status}`)
-            return res.json();
-        } catch(error) {
-            showError(error)
-            hideLoading()
-        }
+async function sendGet(url) {
+    console.log("GETting " + url)
+    try {
+        let res = await fetch(url)
+        if(!res.ok)
+            throw new Error(`fetching error: ${res.status}`)
+        return res.json();
+    } catch(error) {
+        showError(error)
+        hideLoading()
     }
+}
 
+document.addEventListener('DOMContentLoaded', async function() {
     const id = getCookie("account_id");
     if(typeof id != "undefined" && document.cookie != "" && id != "") {
         showLoading(URL+STUDENT_ENDPOINT + "/dao/" + id)
@@ -152,4 +153,56 @@ async function handleRemove(id) {
     hideLoading()
     if(!failed)
         location.reload();
+}
+
+function tableCreate(amount) {
+    var tbl = document.createElement('table');
+    tbl.id = "table-print";
+    tbl.style.width = '100%';
+    tbl.setAttribute('border', '1');
+    var tbdy = document.createElement('tbody');
+
+    return tbl
+}
+
+document.getElementById("print").onclick= async() => {
+    showLoading(URL+STUDENT_ENDPOINT)
+    let students = (await sendGet(URL+STUDENT_ENDPOINT));
+    hideLoading()
+
+    let save = document.body;
+
+    document.body.outerHTML = '';
+    document.body.appendChild(tableCreate());
+    const table = document.getElementById("table-print");
+
+    const header = table.insertRow()
+    let nameH = header.insertCell();
+    nameH.appendChild(document.createTextNode("name"))
+    let genderH = header.insertCell();
+    genderH.appendChild(document.createTextNode("gender"))
+    let dobH = header.insertCell();
+    dobH.appendChild(document.createTextNode("DOB"))
+    let joinedH = header.insertCell();
+    joinedH.appendChild(document.createTextNode("joined"))
+
+    for (const student of students) {
+        const row = table.insertRow()
+
+        let name = row.insertCell();
+        name.appendChild(document.createTextNode(student.name))
+
+        let gender = row.insertCell();
+        gender.appendChild(document.createTextNode(student.gender ? "Male" : "Female"))
+
+        let dob = row.insertCell();
+        dob.appendChild(document.createTextNode(student.dob))
+
+        let created = row.insertCell();
+        created.appendChild(document.createTextNode(student.created))
+    }
+
+    window.print();
+
+    document.body.replaceWith(save);
 }
