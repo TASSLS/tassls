@@ -177,38 +177,61 @@ function tableCreate() {
     return tbl
 }
 
+function giveHeading(label) {
+    let bold = document.createElement('strong');
+    let text = document.createTextNode(label);
+
+    bold.appendChild(text);
+    bold.style.textTransform = "uppercase";
+
+    return bold;
+}
+
 function printP() {
     let save = document.body;
     let students = document.getElementById("unseen").children;
 
     document.body.outerHTML = '';
+
+    let img = document.createElement('img');
+    img.src = "logo-clear.png";
+    img.alt = "logo image";
+    img.style.display = "block";
+    img.style.marginLeft = "auto";
+    img.style.marginRight = "auto";
+    img.style.width = "50%";
+    document.body.appendChild(img);
+    for(let i = 0; i < 2; i++)
+        document.body.appendChild(document.createElement("br"));
+
+
     document.body.appendChild(tableCreate());
     const table = document.getElementById("table-print");
 
-    const header = table.insertRow()
+    const header = table.insertRow();
     let nameH = header.insertCell();
-    nameH.appendChild(document.createTextNode("name"))
+    nameH.appendChild(giveHeading("name"));
     let genderH = header.insertCell();
-    genderH.appendChild(document.createTextNode("gender"))
+    genderH.appendChild(giveHeading("gender"));
     let dobH = header.insertCell();
-    dobH.appendChild(document.createTextNode("DOB"))
+    dobH.appendChild(giveHeading("DOB"));
     let joinedH = header.insertCell();
-    joinedH.appendChild(document.createTextNode("joined"))
+    joinedH.appendChild(giveHeading("joined"));
 
     for(let i = 0; i < students.length; i+=4) {
-        const row = table.insertRow()
+        const row = table.insertRow();
 
         let name = row.insertCell();
-        name.appendChild(document.createTextNode(students[i].innerHTML))
+        name.appendChild(document.createTextNode(students[i].innerHTML));
 
         let gender = row.insertCell();
-        gender.appendChild(document.createTextNode(students[i+1].innerHTML == "true" ? "Male" : "Female"))
+        gender.appendChild(document.createTextNode(students[i+1].innerHTML == "true" ? "Male" : "Female"));
 
         let dob = row.insertCell();
-        dob.appendChild(document.createTextNode(students[i+2].innerHTML))
+        dob.appendChild(document.createTextNode(students[i+2].innerHTML));
 
         let created = row.insertCell();
-        created.appendChild(document.createTextNode(students[i+3].innerHTML))
+        created.appendChild(document.createTextNode(students[i+3].innerHTML));
     }
 
     window.print();
