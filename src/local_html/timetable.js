@@ -82,6 +82,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     hideLoading()
     timetableButton = timetable.data;
     createPeriods(timetable.data);
+    globalTimetable = timetable.data;
 });
 
 function dateDiffInDays(a, b) {
@@ -171,4 +172,84 @@ function toggleSlider() {
     const slider = document.querySelector('.toggle-slider');
     slider.classList.toggle('active');
     skip = !skip;
+}
+
+function tableCreate() {
+    var tbl = document.createElement('table');
+    tbl.id = "table-print";
+    tbl.style.width = '100%';
+    tbl.style.tableLayout = "auto";
+    tbl.setAttribute('border', '1');
+
+    return tbl
+}
+
+function giveHeading(label) {
+    let bold = document.createElement('strong');
+    let text = document.createTextNode(label);
+
+    bold.appendChild(text);
+    bold.style.textTransform = "uppercase";
+
+    return bold;
+}
+
+function printP() {
+    let save = document.body;
+
+    document.body.outerHTML = '';
+
+    let img = document.createElement('img');
+    img.src = "logo-clear.png";
+    img.alt = "logo image";
+    img.style.display = "block";
+    img.style.marginLeft = "auto";
+    img.style.marginRight = "auto";
+    img.style.width = "100%";
+    document.body.appendChild(img);
+    for(let i = 0; i < 2; i++)
+        document.body.appendChild(document.createElement("br"));
+
+
+    document.body.appendChild(tableCreate());
+    const table = document.getElementById("table-print");
+
+    const header = table.insertRow();
+    let dayH = header.insertCell();
+    dayH.appendChild(giveHeading("day"));
+    let periodH = header.insertCell();
+    periodH.appendChild(giveHeading("period"));
+    let roomH = header.insertCell();
+    roomH.appendChild(giveHeading("room"));
+    let subjectH = header.insertCell();
+    subjectH.appendChild(giveHeading("subject"));
+    let teacherH = header.insertCell();
+    teacherH.appendChild(giveHeading("teacher"));
+
+    let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    let currDay = 0;
+    for(let i = 0; i < 100; i++) {
+        const row = table.insertRow();
+
+        if(i%10 == 0)
+            currDay = (++currDay%days.length);
+        let day = row.insertCell();
+        day.appendChild(giveHeading(days[currDay]));
+
+        let period = row.insertCell();
+        period.appendChild(giveHeading("Period " + ((i%10)+1)));
+
+        let room = row.insertCell();
+        room.appendChild(document.createTextNode(timetableButton[i].room));
+
+        let subject = row.insertCell();
+        subject.appendChild(document.createTextNode(timetableButton[i].subject));
+
+        let teacher = row.insertCell();
+        teacher.appendChild(document.createTextNode(timetableButton[i].teacher));
+    }
+
+    window.print();
+
+    document.body.replaceWith(save);
 }
