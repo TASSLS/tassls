@@ -67,23 +67,3 @@ section {
 .login-button:hover, .remove-button:hover {
     background-color: #5782bb;
 }
-
-#print {
-    text-transform: uppercase;
-    padding: 10px;
-    margin: 0 10px;
-    background-color: #333;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-#print:hover {
-    background-color: #5782bb;
-    transition: .3s ease;
-}
-
-#unseen {
-    display: none;
-}

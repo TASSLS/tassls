@@ -525,9 +525,150 @@ document.addEventListener('DOMContentLoaded', async function() {
         box.appendChild(leftHalf);
         box.appendChild(rightHalf);
 
+        const unseen = document.getElementById('unseen');
+        const nameU = document.createElement('p');
+        nameU.textContent = account.name;
+        unseen.appendChild(nameU);
+        const genderU = document.createElement('p');
+        genderU.textContent = account.gender;
+        unseen.appendChild(genderU);
+        const photoU = document.createElement('p');
+        photoU.textContent = account.photo;
+        unseen.appendChild(photoU);
+        const dobU = document.createElement('p');
+        dobU.textContent = account.dob;
+        unseen.appendChild(dobU);
+        const idU = document.createElement('p');
+        idU.textContent = account.id;
+        unseen.appendChild(idU);
+        const usernameU = document.createElement('p');
+        usernameU.textContent = account.username;
+        unseen.appendChild(usernameU);
+        const passwordU = document.createElement('p');
+        passwordU.textContent = account.password;
+        unseen.appendChild(passwordU);
+        const createdU = document.createElement('p');
+        createdU.textContent = account.created;
+        unseen.appendChild(createdU);
+        const updatedU = document.createElement('p');
+        updatedU.textContent = account.updated;
+        unseen.appendChild(updatedU);
+        const timetableU = document.createElement('p');
+        timetableU.textContent = account.timetable_id;
+        unseen.appendChild(timetableU);
+
+        document.getElementById("print").style.display = '';
+
         return box;
     }
 })
+
+function tableCreate() {
+    var tbl = document.createElement('table');
+    tbl.id = "table-print";
+    tbl.style.width = '100%';
+    tbl.setAttribute('border', '1');
+
+    return tbl
+}
+
+function giveHeading(label) {
+    let bold = document.createElement('strong');
+    let text = document.createTextNode(label);
+
+    bold.appendChild(text);
+    bold.style.textTransform = "uppercase";
+
+    return bold;
+}
+
+function printP() {
+    let save = document.body;
+    let students = document.getElementById("unseen").children;
+
+    document.body.outerHTML = '';
+
+    let img = document.createElement('img');
+    img.src = "logo-clear.png";
+    img.alt = "logo image";
+    img.style.display = "block";
+    img.style.marginLeft = "auto";
+    img.style.marginRight = "auto";
+    img.style.width = "50%";
+    document.body.appendChild(img);
+    for(let i = 0; i < 2; i++)
+        document.body.appendChild(document.createElement("br"));
+
+    document.body.appendChild(tableCreate());
+    const table = document.getElementById("table-print");
+
+    // this is horrible but oh well
+    let row = table.insertRow();
+    let nameH = row.insertCell();
+    nameH.appendChild(giveHeading("name"));
+    let name = row.insertCell();
+    name.appendChild(document.createTextNode(students[0].innerHTML));
+    row = table.insertRow();
+    let genderH = row.insertCell();
+    genderH.appendChild(giveHeading("gender"));
+    let gender = row.insertCell();
+    gender.appendChild(document.createTextNode(students[1].innerHTML == "true" ? "Male" : "Female"));
+    row = table.insertRow();
+    let photoH = row.insertCell();
+    photoH.appendChild(giveHeading("photo"));
+    let photo = row.insertCell();
+    photo.appendChild(document.createTextNode(students[2].innerHTML));
+    row = table.insertRow();
+    let dobH = row.insertCell();
+    dobH.appendChild(giveHeading("DOB"));
+    let dob = row.insertCell();
+    dob.appendChild(document.createTextNode(students[3].innerHTML));
+    row = table.insertRow();
+    let idH = row.insertCell();
+    idH.appendChild(giveHeading("id"));
+    let id = row.insertCell();
+    id.appendChild(document.createTextNode(students[4].innerHTML));
+    row = table.insertRow();
+    let usernameH = row.insertCell();
+    usernameH.appendChild(giveHeading("username"));
+    let username = row.insertCell();
+    username.appendChild(document.createTextNode(students[5].innerHTML));
+    row = table.insertRow();
+    let passwordH = row.insertCell();
+    passwordH.appendChild(giveHeading("password"));
+    let password = row.insertCell();
+    password.appendChild(document.createTextNode(students[6].innerHTML));
+    row = table.insertRow();
+    let createdH = row.insertCell();
+    createdH.appendChild(giveHeading("created"));
+    let created = row.insertCell();
+    created.appendChild(document.createTextNode(students[7].innerHTML));
+    row = table.insertRow();
+    let updatedH = row.insertCell();
+    updatedH.appendChild(giveHeading("updated"));
+    let updated = row.insertCell();
+    updated.appendChild(document.createTextNode(students[8].innerHTML));
+    row = table.insertRow();
+    let timetable_idH = row.insertCell();
+    timetable_idH.appendChild(giveHeading("timetable_id"));
+    let timetable_id = row.insertCell();
+    timetable_id.appendChild(document.createTextNode(students[9].innerHTML));
+
+    document.body.appendChild(document.createElement("br"));
+    let pfp = document.createElement('img');
+    pfp.src = students[2].innerHTML;
+    pfp.alt = "profile image";
+    pfp.style.borderRadius = "10%";
+    pfp.style.display = "block";
+    pfp.style.marginLeft = "auto";
+    pfp.style.marginRight = "auto";
+    pfp.style.width = "20%";
+    document.body.appendChild(pfp);
+
+    window.print();
+
+    document.body.replaceWith(save);
+}
 
 function changePassword(info) {
     const passwordInput = document.getElementById("passwordButton");

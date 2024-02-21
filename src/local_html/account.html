@@ -21,6 +21,7 @@
             <a href="./account.html" id="nav-account" class="nav-selected">LOGIN</a>
             <a href="./timetable.html">TIMETABLE</a>
             <a href="./list.html">LIST</a>
+            <button onclick="printP()" style="display: none" id="print">Print Items</button>
         </nav>
 
         <div id="errorBox">Error: Request failed. Please try again.</div>
@@ -55,6 +56,9 @@
             <button type="button" id="editButton" onclick="editAsAdmin()">Edit Account</button>
             <button type="button" onclick="removeAsAdmin()">Remove Account</button>
         </div>
+
+        <section id="unseen"></section>
+
         <section>
             <p>TASSLS</p>
             <p>The Alpha School System Like System</p>
