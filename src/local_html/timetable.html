@@ -28,12 +28,47 @@
             <div id="loading-text">fetching...</div>
         </div>
 
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+
+            th, td {
+                border: 1px solid #333;
+                padding: 10px;
+                text-align: left;
+            }
+
+            th {
+                background-color: #333;
+                color: white;
+            }
+
+            th:nth-child(1), td:nth-child(1) {
+                width: 13%;
+            }
+
+            th:nth-child(2), td:nth-child(2) {
+                width: 40%;
+            }
+
+            th:nth-child(3), td:nth-child(3) {
+                width: 15%;
+            }
+
+            th:nth-child(4), td:nth-child(4) {
+                width: 40%;
+            }
+        </style>
+
         <div class="timetable-container">
             <div class="timetable-left">
                 <table>
                     <thead>
                         <tr>
-                            <th>Period</th>
+                            <th id = >Period</th>
                             <th>Subject</th>
                             <th>Room</th>
                             <th>Teacher</th>

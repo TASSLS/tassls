@@ -216,7 +216,7 @@ function printP() {
 
     const header = table.insertRow();
     let dayH = header.insertCell();
-    dayH.appendChild(giveHeading("day"));
+    dayH.appendChild(giveHeading("day <W>"));
     let periodH = header.insertCell();
     periodH.appendChild(giveHeading("period"));
     let roomH = header.insertCell();
@@ -226,18 +226,18 @@ function printP() {
     let teacherH = header.insertCell();
     teacherH.appendChild(giveHeading("teacher"));
 
-    let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+    let days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
     let currDay = 0;
     for(let i = 0; i < 100; i++) {
         const row = table.insertRow();
 
-        if(i%10 == 0)
-            currDay = (++currDay%days.length);
+        if(i%10 == 0 && i)
+            currDay++;
         let day = row.insertCell();
-        day.appendChild(giveHeading(days[currDay]));
+        day.appendChild(document.createTextNode(days[currDay%days.length] + " " + (currDay/days.length < 1 ? "A" : "B")));
 
         let period = row.insertCell();
-        period.appendChild(giveHeading("Period " + ((i%10)+1)));
+        period.appendChild(document.createTextNode("Period " + ((i%10)+1)));
 
         let room = row.insertCell();
         room.appendChild(document.createTextNode(timetableButton[i].room));

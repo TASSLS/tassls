@@ -14,23 +14,6 @@
     text-align: center;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-th, td {
-    border: 1px solid #333;
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #333;
-    color: white;
-}
-
 .timetable-buttons {
     margin-bottom: 20px;
 }
@@ -50,25 +33,8 @@ th {
     transition: .3s ease;
 }
 
-th:nth-child(1), td:nth-child(1) {
-    width: 13%;
-}
-
-th:nth-child(2), td:nth-child(2) {
-    width: 40%;
-}
-
-th:nth-child(3), td:nth-child(3) {
-    width: 15%;
-}
-
-th:nth-child(4), td:nth-child(4) {
-    width: 40%;
-}
-
 .tooltip {
     position: relative;
-    border-bottom: none;
 }
 
 .tooltip .tooltiptext {
